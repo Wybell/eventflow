@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: eventflow
+  main:
+    banner-mode: "off"
+
+eventflow:
+  security:
+    jwt:
+      issuer: ${EVENTFLOW_JWT_ISSUER:eventflow}
+      secret: ${EVENTFLOW_JWT_SECRET:}
+      access-token-ttl: PT30M
+      refresh-token-ttl: P7D
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  pattern:
+    level: "%5p [requestId=%X{requestId:-}]"
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
