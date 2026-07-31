@@ -1,0 +1,13 @@
+{
+  "name": "eventflow",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.9.0",
+  "scripts": {
+    "frontend:dev": "pnpm --dir frontend dev",
+    "frontend:build": "pnpm --dir frontend build",
+    "frontend:lint": "pnpm --dir frontend lint",
+    "frontend:test": "pnpm --dir frontend test --run",
+    "frontend:typecheck": "pnpm --dir frontend typecheck"
+  }
+}

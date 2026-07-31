@@ -1,0 +1,16 @@
+.idea/
+.vscode/
+*.iml
+
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+
+frontend/node_modules/
+frontend/dist/
+frontend/coverage/
+node_modules/
+.pnpm-store/
+pnpm-debug.log*
+
+deploy/.env
+*.log
