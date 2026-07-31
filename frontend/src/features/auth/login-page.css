@@ -1,0 +1,157 @@
+.login-page {
+  min-height: 100dvh;
+  overflow: hidden;
+  position: relative;
+}
+
+.login-page__scene {
+  background-image: url('/login-portal-background.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  inset: 0;
+  position: absolute;
+}
+
+.login-page__content {
+  align-items: center;
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 auto;
+  min-height: 100dvh;
+  padding: 72px clamp(28px, 8vw, 132px);
+  position: relative;
+}
+
+.login-page__identity {
+  align-items: center;
+  color: #f7fdff;
+  display: inline-flex;
+  font-size: 23px;
+  font-weight: 600;
+  gap: 10px;
+  left: clamp(28px, 8vw, 132px);
+  letter-spacing: 0;
+  position: absolute;
+  top: 38px;
+}
+
+.login-page__brand-mark {
+  align-items: center;
+  background: rgba(71, 214, 255, 0.16);
+  border: 1px solid rgba(145, 239, 255, 0.58);
+  border-radius: 8px;
+  color: #96efff;
+  display: inline-flex;
+  height: 38px;
+  justify-content: center;
+  width: 38px;
+}
+
+.login-panel,
+.access-panel {
+  backdrop-filter: blur(18px);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(207, 232, 240, 0.96);
+  border-radius: 8px;
+  box-shadow: 0 24px 72px rgba(3, 23, 49, 0.24);
+  max-width: 432px;
+  padding: 38px;
+  width: 100%;
+}
+
+.login-panel__heading {
+  margin-bottom: 30px;
+}
+
+.login-panel__heading .ant-typography,
+.access-panel .ant-typography {
+  color: #0b2440;
+  letter-spacing: 0;
+}
+
+.login-panel__heading h1,
+.access-panel h1 {
+  font-size: 30px;
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+.login-panel__heading p,
+.access-panel p {
+  color: #557187;
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 0;
+}
+
+.login-panel .ant-form-item-label > label {
+  color: #294962;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.login-panel .ant-input-affix-wrapper {
+  background: #f7fcfe;
+  border-color: #cfe6ec;
+  border-radius: 6px;
+  min-height: 46px;
+}
+
+.login-panel .ant-input-affix-wrapper:focus,
+.login-panel .ant-input-affix-wrapper-focused {
+  border-color: #35bfe4;
+  box-shadow: 0 0 0 3px rgba(53, 191, 228, 0.16);
+}
+
+.login-panel__submit {
+  align-items: center;
+  background: #0789b7;
+  border-color: #0789b7;
+  box-shadow: 0 10px 22px rgba(7, 137, 183, 0.28);
+  display: inline-flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.login-panel__submit:hover,
+.login-panel__submit:focus {
+  background: #04739d !important;
+  border-color: #04739d !important;
+}
+
+.login-panel__error {
+  color: #b42318;
+  font-size: 13px;
+  margin: -6px 0 14px;
+}
+
+.access-panel {
+  text-align: left;
+}
+
+.access-panel .ant-btn {
+  margin-top: 14px;
+}
+
+@media (max-width: 720px) {
+  .login-page__scene {
+    background-position: 42% top;
+  }
+
+  .login-page__content {
+    align-items: flex-end;
+    padding: 96px 20px 24px;
+  }
+
+  .login-page__identity {
+    font-size: 20px;
+    left: 20px;
+    top: 22px;
+  }
+
+  .login-panel,
+  .access-panel {
+    padding: 28px 22px;
+  }
+}
