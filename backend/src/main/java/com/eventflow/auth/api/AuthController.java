@@ -4,6 +4,9 @@ import com.eventflow.auth.api.dto.AuthTokenResponse;
 import com.eventflow.auth.api.dto.CurrentUserResponse;
 import com.eventflow.auth.api.dto.LoginRequest;
 import com.eventflow.auth.api.dto.RefreshTokenRequest;
+import com.eventflow.auth.api.dto.RegisterRequest;
+import com.eventflow.auth.api.dto.RegistrationResponse;
+import com.eventflow.auth.application.AccountRegistrationService;
 import com.eventflow.auth.application.AuthService;
 import com.eventflow.shared.api.ApiResponse;
 import com.eventflow.shared.security.AuthenticatedPrincipal;
@@ -20,14 +23,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final AccountRegistrationService accountRegistrationService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, AccountRegistrationService accountRegistrationService) {
         this.authService = authService;
+        this.accountRegistrationService = accountRegistrationService;
     }
 
     @PostMapping("/login")
     public ApiResponse<AuthTokenResponse> login(@Valid @RequestBody LoginRequest request) {
         return ApiResponse.success(authService.login(request));
+    }
+
+    @PostMapping("/register")
+    public ApiResponse<RegistrationResponse> register(@Valid @RequestBody RegisterRequest request) {
+        return ApiResponse.success(accountRegistrationService.register(request));
     }
 
     @PostMapping("/refresh")

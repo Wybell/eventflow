@@ -45,6 +45,13 @@ public class ActivitySessionController {
                 .toList());
     }
 
+    @GetMapping("/public")
+    public ApiResponse<List<SessionResponse>> listPublished(@PathVariable Long activityId) {
+        return ApiResponse.success(activitySessionService.listPublished(activityId).stream()
+                .map(SessionResponse::from)
+                .toList());
+    }
+
     public record CreateRequest(
             @NotBlank @Size(max = 120) String title,
             @NotNull LocalDateTime startTime,

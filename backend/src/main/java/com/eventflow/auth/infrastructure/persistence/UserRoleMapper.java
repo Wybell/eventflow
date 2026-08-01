@@ -1,6 +1,7 @@
 package com.eventflow.auth.infrastructure.persistence;
 
 import java.util.List;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -18,4 +19,14 @@ public interface UserRoleMapper {
             ORDER BY r.role_code
             """)
     List<String> findRoleCodesByUserId(@Param("userId") Long userId);
+
+    @Select("SELECT id FROM ef_role WHERE role_code = #{roleCode} AND status = 'ACTIVE' LIMIT 1")
+    Long findRoleIdByCode(@Param("roleCode") String roleCode);
+
+    @Insert(
+            """
+            INSERT INTO ef_user_role_rel (user_id, role_id)
+            VALUES (#{userId}, #{roleId})
+            """)
+    int insertUserRole(@Param("userId") Long userId, @Param("roleId") Long roleId);
 }

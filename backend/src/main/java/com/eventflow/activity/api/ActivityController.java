@@ -50,6 +50,13 @@ public class ActivityController {
                 .toList());
     }
 
+    @GetMapping("/public")
+    public ApiResponse<List<ActivityResponse>> listPublished() {
+        return ApiResponse.success(activityService.listPublished().stream()
+                .map(ActivityResponse::from)
+                .toList());
+    }
+
     @GetMapping("/{id}")
     public ApiResponse<ActivityResponse> get(
             @AuthenticationPrincipal AuthenticatedPrincipal principal, @PathVariable Long id) {

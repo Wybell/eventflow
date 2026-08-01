@@ -22,4 +22,7 @@ public interface UserAccountMapper extends BaseMapper<UserAccount> {
 
     @Update("UPDATE ef_user SET last_login_time = #{loginTime} WHERE id = #{id}")
     int updateLastLoginTime(@Param("id") Long id, @Param("loginTime") LocalDateTime loginTime);
+
+    @Update("UPDATE ef_user SET organization_id = #{organizationId} WHERE id = #{id}")
+    int updateOrganizationId(@Param("id") Long id, @Param("organizationId") Long organizationId);
 }

@@ -55,6 +55,19 @@ public class ActivitySessionService {
                 .orderByAsc(ActivitySession::getId));
     }
 
+    @Transactional(readOnly = true)
+    public List<ActivitySession> listPublished(Long activityId) {
+        Activity activity = activityMapper.selectById(activityId);
+        if (activity == null || activity.getStatus() != ActivityStatus.PUBLISHED) {
+            throw new BusinessException(ErrorCode.RESOURCE_NOT_FOUND);
+        }
+        return activitySessionMapper.selectList(new LambdaQueryWrapper<ActivitySession>()
+                .eq(ActivitySession::getActivityId, activityId)
+                .eq(ActivitySession::getStatus, ActivitySessionStatus.ACTIVE)
+                .orderByAsc(ActivitySession::getStartTime)
+                .orderByAsc(ActivitySession::getId));
+    }
+
     private Activity requireDraftActivityOwnership(AuthenticatedPrincipal principal, Long activityId) {
         Activity activity = requireActivityOwnership(principal, activityId);
         if (activity.getStatus() != ActivityStatus.DRAFT) {

@@ -60,6 +60,13 @@ public class ActivityService {
     }
 
     @Transactional(readOnly = true)
+    public List<Activity> listPublished() {
+        return activityMapper.selectList(new LambdaQueryWrapper<Activity>()
+                .eq(Activity::getStatus, ActivityStatus.PUBLISHED)
+                .orderByDesc(Activity::getId));
+    }
+
+    @Transactional(readOnly = true)
     public Activity get(AuthenticatedPrincipal principal, Long id) {
         Activity activity = findRequired(id);
         if (!hasRole(principal, ADMIN_ROLE)) {
