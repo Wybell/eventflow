@@ -6,7 +6,7 @@
 
 .login-page__scene {
   background-image: url('/login-portal-background.png');
-  background-position: center;
+  background-position: center 35%;
   background-repeat: no-repeat;
   background-size: cover;
   inset: 0;
@@ -126,6 +126,47 @@
   margin: -6px 0 14px;
 }
 
+.login-panel__register,
+.register-panel__back {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #057fa5;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: inherit;
+  font-size: 14px;
+  gap: 7px;
+  justify-content: center;
+  margin: 22px auto 0;
+  padding: 4px;
+}
+
+.login-panel__register {
+  display: flex;
+}
+
+.register-page .login-page__content {
+  padding-block: 42px;
+}
+
+.register-panel {
+  max-height: calc(100dvh - 84px);
+  overflow-y: auto;
+}
+
+.register-panel__back {
+  margin: -6px 0 18px;
+}
+
+.register-panel__type {
+  margin-bottom: 24px;
+}
+
+.register-panel__fields .ant-form-item {
+  margin-bottom: 14px;
+}
+
 .access-panel {
   text-align: left;
 }
@@ -136,7 +177,7 @@
 
 @media (max-width: 720px) {
   .login-page__scene {
-    background-position: 42% top;
+    background-position: 42% 28%;
   }
 
   .login-page__content {

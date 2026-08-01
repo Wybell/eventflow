@@ -16,6 +16,11 @@ export async function getMyActivities(): Promise<Activity[]> {
   return response.data.data;
 }
 
+export async function getPublishedActivities(): Promise<Activity[]> {
+  const response = await httpClient.get<ApiResponse<Activity[]>>('/v1/activities/public');
+  return response.data.data;
+}
+
 export async function createActivity(input: ActivityInput): Promise<number> {
   const response = await httpClient.post<ApiResponse<IdResponse>>('/v1/activities', input);
   return response.data.data.id;
@@ -32,6 +37,13 @@ export async function publishActivity(id: number): Promise<void> {
 export async function getActivitySessions(activityId: number): Promise<ActivitySession[]> {
   const response = await httpClient.get<ApiResponse<ActivitySession[]>>(
     `/v1/activities/${activityId}/sessions`,
+  );
+  return response.data.data;
+}
+
+export async function getPublishedActivitySessions(activityId: number): Promise<ActivitySession[]> {
+  const response = await httpClient.get<ApiResponse<ActivitySession[]>>(
+    `/v1/activities/${activityId}/sessions/public`,
   );
   return response.data.data;
 }

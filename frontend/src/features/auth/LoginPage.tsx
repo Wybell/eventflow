@@ -1,23 +1,26 @@
 import { useMutation } from '@tanstack/react-query';
 import { Button, Form, Input, Typography } from 'antd';
-import { LockKeyhole, LogIn, Orbit, UserRound } from 'lucide-react';
+import { LockKeyhole, LogIn, Orbit, UserPlus, UserRound } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSessionStore } from '../../shared/auth/session-store';
 import type { ApiError } from '../../shared/api/api-contract';
-import { login } from './auth-api';
+import { getCurrentUser, login } from './auth-api';
+import { defaultRouteForUser } from './auth-routing';
 import type { LoginInput } from './auth-types';
 import './login-page.css';
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const setAccessToken = useSessionStore((state) => state.setAccessToken);
+  const setSession = useSessionStore((state) => state.setSession);
   const loginMutation = useMutation({ mutationFn: login });
 
   const handleSubmit = async (values: LoginInput) => {
     try {
       const tokens = await loginMutation.mutateAsync(values);
-      setAccessToken(tokens.accessToken);
-      navigate('/organizer/activities', { replace: true });
+      useSessionStore.getState().setAccessToken(tokens.accessToken);
+      const user = await getCurrentUser();
+      setSession(tokens.accessToken, user);
+      navigate(defaultRouteForUser(user), { replace: true });
     } catch {
       // The form renders the normalized server error below the submit action.
     }
@@ -83,6 +86,14 @@ export function LoginPage() {
           >
             登录
           </Button>
+          <button
+            className="login-panel__register"
+            type="button"
+            onClick={() => navigate('/register')}
+          >
+            <UserPlus size={16} />
+            注册账号
+          </button>
         </Form>
       </div>
     </section>
