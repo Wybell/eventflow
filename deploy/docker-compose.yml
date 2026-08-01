@@ -9,7 +9,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${EVENTFLOW_DB_ROOT_PASSWORD}
       TZ: Asia/Shanghai
     ports:
-      - "3306:3306"
+      - "${EVENTFLOW_DB_PORT:-3306}:3306"
     volumes:
       - eventflow-mysql-data:/var/lib/mysql
     healthcheck:

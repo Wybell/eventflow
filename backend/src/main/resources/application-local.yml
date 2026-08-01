@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: ${EVENTFLOW_DB_URL:jdbc:mysql://localhost:3306/eventflow?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai}
+    url: jdbc:mysql://localhost:${EVENTFLOW_DB_PORT:3306}/eventflow?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
     username: ${EVENTFLOW_DB_USERNAME:eventflow}
     password: ${EVENTFLOW_DB_PASSWORD}
   data:
