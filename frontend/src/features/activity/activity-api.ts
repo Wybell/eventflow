@@ -30,8 +30,8 @@ export async function updateActivity(id: number, input: ActivityInput): Promise<
   await httpClient.put<ApiResponse<null>>(`/v1/activities/${id}`, input);
 }
 
-export async function publishActivity(id: number): Promise<void> {
-  await httpClient.post<ApiResponse<null>>(`/v1/activities/${id}/publish`);
+export async function submitActivityForReview(id: number): Promise<void> {
+  await httpClient.post<ApiResponse<null>>(`/v1/activities/${id}/submit-review`);
 }
 
 export async function getActivitySessions(activityId: number): Promise<ActivitySession[]> {

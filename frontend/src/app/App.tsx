@@ -14,8 +14,8 @@ const RegisterPage = lazy(async () => ({
 const EventExplorePage = lazy(async () => ({
   default: (await import('../features/participant/EventExplorePage')).EventExplorePage,
 }));
-const OrganizerApplicationsPage = lazy(async () => ({
-  default: (await import('../features/admin/OrganizerApplicationsPage')).OrganizerApplicationsPage,
+const ActivityReviewPage = lazy(async () => ({
+  default: (await import('../features/admin/ActivityReviewPage')).ActivityReviewPage,
 }));
 
 export function App() {
@@ -42,28 +42,28 @@ export function App() {
           path="/events"
           element={
             <Suspense fallback={null}>
-              <RoleRoute roles={['USER']}>
+              <AuthenticatedRoute>
                 <EventExplorePage />
-              </RoleRoute>
+              </AuthenticatedRoute>
             </Suspense>
           }
         />
         <Route
-          path="/organizer/activities"
+          path="/my-activities"
           element={
             <Suspense fallback={null}>
-              <RoleRoute roles={['ORGANIZER']}>
+              <AuthenticatedRoute>
                 <ActivityWorkspace />
-              </RoleRoute>
+              </AuthenticatedRoute>
             </Suspense>
           }
         />
         <Route
-          path="/admin/organizer-applications"
+          path="/admin/activity-reviews"
           element={
             <Suspense fallback={null}>
               <RoleRoute roles={['ADMIN']}>
-                <OrganizerApplicationsPage />
+                <ActivityReviewPage />
               </RoleRoute>
             </Suspense>
           }
@@ -81,6 +81,14 @@ function RoleRoute({ children, roles }: { children: React.ReactNode; roles: stri
   }
   if (!roles.some((role) => currentUser.roles.includes(role))) {
     return <Navigate to={defaultRouteForUser(currentUser)} replace />;
+  }
+  return <>{children}</>;
+}
+
+function AuthenticatedRoute({ children }: { children: React.ReactNode }) {
+  const currentUser = useSessionStore((state) => state.currentUser);
+  if (currentUser === null) {
+    return <Navigate to="/login" replace />;
   }
   return <>{children}</>;
 }

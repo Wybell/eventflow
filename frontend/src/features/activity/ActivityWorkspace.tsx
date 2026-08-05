@@ -17,7 +17,7 @@ import {
   Typography,
   message,
 } from 'antd';
-import type { Dayjs } from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 import {
   CalendarPlus,
   ChevronRight,
@@ -26,7 +26,7 @@ import {
   Plus,
   RadioTower,
   Rocket,
-  Users,
+  Send,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -37,7 +37,7 @@ import {
   createActivitySession,
   getActivitySessions,
   getMyActivities,
-  publishActivity,
+  submitActivityForReview,
   updateActivity,
 } from './activity-api';
 import type { Activity, ActivityInput, ActivitySessionInput } from './activity-types';
@@ -57,6 +57,7 @@ export function ActivityWorkspace() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const clearSession = useSessionStore((state) => state.clearSession);
+  const currentUser = useSessionStore((state) => state.currentUser);
   const [messageApi, contextHolder] = message.useMessage();
   const [isActivityDrawerOpen, setActivityDrawerOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
@@ -81,7 +82,7 @@ export function ActivityWorkspace() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ACTIVITY_QUERY_KEY });
-      messageApi.success(selectedActivity === null ? '活动草稿已创建' : '活动信息已更新');
+      messageApi.success(selectedActivity === null ? '活动草稿已创建' : '活动信息已保存');
       setActivityDrawerOpen(false);
     },
     onError: (error: ApiError) => messageApi.error(error.message),
@@ -105,11 +106,12 @@ export function ActivityWorkspace() {
     onError: (error: ApiError) => messageApi.error(error.message),
   });
 
-  const publishMutation = useMutation({
-    mutationFn: publishActivity,
+  const submitMutation = useMutation({
+    mutationFn: submitActivityForReview,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ACTIVITY_QUERY_KEY });
-      messageApi.success('活动已发布');
+      setSelectedActivity(null);
+      messageApi.success('活动已提交审核，通过后将自动公开发布');
     },
     onError: (error: ApiError) => messageApi.error(error.message),
   });
@@ -118,8 +120,8 @@ export function ActivityWorkspace() {
     const activities = activitiesQuery.data ?? [];
     return {
       total: activities.length,
+      pendingReview: activities.filter((activity) => activity.status === 'PENDING_REVIEW').length,
       published: activities.filter((activity) => activity.status === 'PUBLISHED').length,
-      draft: activities.filter((activity) => activity.status === 'DRAFT').length,
     };
   }, [activitiesQuery.data]);
 
@@ -136,17 +138,25 @@ export function ActivityWorkspace() {
       summary: activity.summary ?? undefined,
       coverUrl: activity.coverUrl ?? undefined,
       venueName: activity.venueName ?? undefined,
+      organizerName: activity.organizerName,
+      contactName: activity.contactName,
+      contactMobile: activity.contactMobile ?? undefined,
+      contactEmail: activity.contactEmail ?? undefined,
+      registrationWindow: [
+        dayjs(activity.registrationStartTime),
+        dayjs(activity.registrationEndTime),
+      ],
     });
     setActivityDrawerOpen(true);
   };
 
-  const confirmPublish = (activity: Activity) => {
+  const confirmSubmit = (activity: Activity) => {
     Modal.confirm({
-      title: '确认发布活动？',
-      content: '发布后活动基础信息不可再编辑，请确认报名时间和场次设置已完成。',
-      okText: '发布活动',
-      cancelText: '暂不发布',
-      onOk: () => publishMutation.mutateAsync(activity.id),
+      title: '提交活动审核？',
+      content: '提交前请确认活动资料与场次配置无误。审核通过后，活动将自动公开发布。',
+      okText: '提交审核',
+      cancelText: '继续编辑',
+      onOk: () => submitMutation.mutateAsync(activity.id),
     });
   };
 
@@ -156,26 +166,29 @@ export function ActivityWorkspace() {
   };
 
   return (
-    <section className="activity-workspace" aria-label="活动管理工作台">
+    <section className="activity-workspace" aria-label="我的活动">
       {contextHolder}
       <header className="activity-workspace__header">
         <button
           className="activity-workspace__brand"
           type="button"
-          onClick={() => setSelectedActivity(null)}
+          onClick={() => navigate('/events')}
         >
           <span className="activity-workspace__brand-mark" aria-hidden="true">
             <RadioTower size={24} />
           </span>
           <span>
             <strong>EventFlow</strong>
-            <small>活动管理控制台</small>
+            <small>我的活动</small>
           </span>
         </button>
         <div className="activity-workspace__header-actions">
+          <Tooltip title="活动广场">
+            <Button onClick={() => navigate('/events')}>活动广场</Button>
+          </Tooltip>
           <Tooltip title="创建活动">
             <Button icon={<CalendarPlus size={18} />} onClick={openCreateDrawer} type="primary">
-              创建活动
+              发布活动
             </Button>
           </Tooltip>
           <Tooltip title="退出登录">
@@ -193,35 +206,31 @@ export function ActivityWorkspace() {
         <section className="activity-workspace__intro" aria-labelledby="activity-title">
           <div>
             <Typography.Title id="activity-title" level={1}>
-              活动指挥中心
+              发布你的活动
             </Typography.Title>
             <Typography.Paragraph>
-              从活动草稿、场次配额到发布状态，在一个工作区内完成管理。
+              {currentUser?.displayName ?? '你'}可以创建活动草稿、设置场次与名额，并提交平台审核。
             </Typography.Paragraph>
           </div>
           <div className="activity-workspace__metrics" aria-label="活动状态汇总">
             <Metric icon={<CircleGauge size={19} />} label="全部活动" value={summary.total} />
+            <Metric icon={<Send size={19} />} label="审核中" value={summary.pendingReview} />
             <Metric icon={<Rocket size={19} />} label="已发布" value={summary.published} />
-            <Metric icon={<Users size={19} />} label="待配置" value={summary.draft} />
           </div>
         </section>
 
         <section className="activity-workspace__console" aria-label="活动列表">
           <div className="activity-workspace__console-head">
             <div>
-              <span>活动编队</span>
-              <Typography.Title level={2}>管理活动与名额</Typography.Title>
+              <span>活动工作区</span>
+              <Typography.Title level={2}>管理草稿与审核状态</Typography.Title>
             </div>
             <Button icon={<Plus size={17} />} onClick={openCreateDrawer} type="primary">
-              新建草稿
+              新建活动
             </Button>
           </div>
 
-          {activitiesQuery.isLoading ? (
-            <div className="activity-workspace__loading">
-              <Spin />
-            </div>
-          ) : null}
+          {activitiesQuery.isLoading ? <LoadingState /> : null}
           {activitiesQuery.isError ? <ErrorState error={activitiesQuery.error} /> : null}
           {activitiesQuery.data?.length === 0 ? <EmptyState onCreate={openCreateDrawer} /> : null}
           {activitiesQuery.data && activitiesQuery.data.length > 0 ? (
@@ -229,9 +238,10 @@ export function ActivityWorkspace() {
               {activitiesQuery.data.map((activity) => (
                 <ActivityRow
                   activity={activity}
+                  key={activity.id}
                   onEdit={() => openEditDrawer(activity)}
-                  onPublish={() => confirmPublish(activity)}
                   onSelect={() => setSelectedActivity(activity)}
+                  onSubmit={() => confirmSubmit(activity)}
                 />
               ))}
             </div>
@@ -245,7 +255,7 @@ export function ActivityWorkspace() {
         destroyOnClose
         onClose={() => setActivityDrawerOpen(false)}
         open={isActivityDrawerOpen}
-        title={selectedActivity === null ? '建立活动草稿' : '编辑活动基础信息'}
+        title={selectedActivity === null ? '创建活动草稿' : '编辑活动信息'}
         width={520}
       >
         <Form<ActivityFormValues>
@@ -260,6 +270,30 @@ export function ActivityWorkspace() {
             rules={[{ required: true, message: '请输入活动名称' }]}
           >
             <Input maxLength={120} placeholder="例如：2026 开发者峰会" size="large" />
+          </Form.Item>
+          <Form.Item
+            label="主办名称"
+            name="organizerName"
+            rules={[{ required: true, message: '请输入主办名称' }]}
+          >
+            <Input maxLength={120} placeholder="例如：EventFlow 技术社区" size="large" />
+          </Form.Item>
+          <Form.Item
+            label="联系人"
+            name="contactName"
+            rules={[{ required: true, message: '请输入联系人' }]}
+          >
+            <Input maxLength={64} placeholder="用于审核与活动咨询" size="large" />
+          </Form.Item>
+          <Form.Item label="联系电话" name="contactMobile">
+            <Input maxLength={20} placeholder="选填" size="large" />
+          </Form.Item>
+          <Form.Item
+            label="联系邮箱"
+            name="contactEmail"
+            rules={[{ type: 'email', message: '请输入正确的邮箱地址' }]}
+          >
+            <Input maxLength={255} placeholder="选填" size="large" />
           </Form.Item>
           <Form.Item label="活动简介" name="summary">
             <Input.TextArea
@@ -316,6 +350,11 @@ export function ActivityWorkspace() {
                 )}
               </span>
             </div>
+            {selectedActivity.reviewNote ? (
+              <Typography.Paragraph className="activity-workspace__review-note">
+                审核说明：{selectedActivity.reviewNote}
+              </Typography.Paragraph>
+            ) : null}
             <Typography.Paragraph>
               {selectedActivity.summary || '尚未填写活动简介。'}
             </Typography.Paragraph>
@@ -324,17 +363,8 @@ export function ActivityWorkspace() {
                 <span>名额控制</span>
                 <Typography.Title level={3}>场次与配额</Typography.Title>
               </div>
-              {selectedActivity.status === 'DRAFT' ? (
-                <Button
-                  icon={<Plus size={16} />}
-                  onClick={() => sessionForm.submit()}
-                  type="primary"
-                >
-                  添加场次
-                </Button>
-              ) : null}
             </div>
-            {selectedActivity.status === 'DRAFT' ? (
+            {canConfigureSessions(selectedActivity) ? (
               <Form<SessionFormValues>
                 className="activity-workspace__session-form"
                 form={sessionForm}
@@ -368,6 +398,14 @@ export function ActivityWorkspace() {
                 >
                   <InputNumber min={1} placeholder="80" style={{ width: '100%' }} />
                 </Form.Item>
+                <Button
+                  htmlType="submit"
+                  icon={<Plus size={16} />}
+                  loading={sessionMutation.isPending}
+                  type="primary"
+                >
+                  添加场次
+                </Button>
               </Form>
             ) : null}
             <List
@@ -416,14 +454,15 @@ function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; 
 function ActivityRow({
   activity,
   onEdit,
-  onPublish,
+  onSubmit,
   onSelect,
 }: {
   activity: Activity;
   onEdit: () => void;
-  onPublish: () => void;
+  onSubmit: () => void;
   onSelect: () => void;
 }) {
+  const canEdit = activity.status === 'DRAFT' || activity.status === 'REJECTED';
   return (
     <article className="activity-workspace__activity-row">
       <button className="activity-workspace__activity-main" onClick={onSelect} type="button">
@@ -440,13 +479,11 @@ function ActivityRow({
         <ChevronRight aria-hidden="true" size={18} />
       </button>
       <div className="activity-workspace__row-actions">
-        {activity.status === 'DRAFT' ? (
-          <>
-            <Button onClick={onEdit}>编辑</Button>
-            <Button onClick={onPublish} type="primary">
-              发布
-            </Button>
-          </>
+        {canEdit ? <Button onClick={onEdit}>编辑</Button> : null}
+        {canEdit ? (
+          <Button icon={<Send size={15} />} onClick={onSubmit} type="primary">
+            提交审核
+          </Button>
         ) : null}
       </div>
     </article>
@@ -455,9 +492,11 @@ function ActivityRow({
 
 function StatusTag({ status }: { status: Activity['status'] }) {
   const labels: Record<Activity['status'], string> = {
-    DRAFT: '草稿配置中',
-    PUBLISHED: '报名已开放',
-    OFFLINE: '已下线',
+    DRAFT: '草稿待配置',
+    PENDING_REVIEW: '审核中',
+    REJECTED: '已驳回，待修改',
+    PUBLISHED: '已公开发布',
+    OFFLINE: '已下架',
   };
   return (
     <Tag
@@ -478,15 +517,27 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
   );
 }
 
+function LoadingState() {
+  return (
+    <div className="activity-workspace__loading">
+      <Spin />
+    </div>
+  );
+}
+
 function ErrorState({ error }: { error: unknown }) {
-  const message =
+  const errorMessage =
     typeof error === 'object' &&
     error !== null &&
     'message' in error &&
     typeof error.message === 'string'
       ? error.message
       : '加载活动数据失败';
-  return <Empty description={message} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+  return <Empty description={errorMessage} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
+}
+
+function canConfigureSessions(activity: Activity): boolean {
+  return activity.status === 'DRAFT' || activity.status === 'REJECTED';
 }
 
 function toActivityInput(values: ActivityFormValues): ActivityInput {
@@ -495,14 +546,16 @@ function toActivityInput(values: ActivityFormValues): ActivityInput {
     summary: values.summary,
     coverUrl: values.coverUrl,
     venueName: values.venueName,
+    organizerName: values.organizerName,
+    contactName: values.contactName,
+    contactMobile: values.contactMobile,
+    contactEmail: values.contactEmail,
     registrationStartTime: values.registrationWindow[0].format('YYYY-MM-DDTHH:mm:ss'),
     registrationEndTime: values.registrationWindow[1].format('YYYY-MM-DDTHH:mm:ss'),
   };
 }
 
 function formatDateRange(start: string, end: string): string {
-  const startValue = new Date(start);
-  const endValue = new Date(end);
   const formatter = new Intl.DateTimeFormat('zh-CN', {
     month: '2-digit',
     day: '2-digit',
@@ -510,5 +563,5 @@ function formatDateRange(start: string, end: string): string {
     minute: '2-digit',
     hour12: false,
   });
-  return `${formatter.format(startValue)} 至 ${formatter.format(endValue)}`;
+  return `${formatter.format(new Date(start))} 至 ${formatter.format(new Date(end))}`;
 }

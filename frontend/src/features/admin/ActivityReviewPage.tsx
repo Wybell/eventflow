@@ -4,44 +4,38 @@ import { Check, LogOut, RadioTower, X } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSessionStore } from '../../shared/auth/session-store';
-import {
-  getOrganizerApplications,
-  reviewOrganizerApplication,
-  type OrganizerApplication,
-} from './organizer-application-api';
+import type { Activity } from '../activity/activity-types';
+import { getPendingActivityReviews, reviewActivity } from './activity-review-api';
 import './organizer-applications.css';
 
-export function OrganizerApplicationsPage() {
+export function ActivityReviewPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const clearSession = useSessionStore((state) => state.clearSession);
   const [messageApi, contextHolder] = message.useMessage();
   const [reviewTarget, setReviewTarget] = useState<{
-    application: OrganizerApplication;
+    activity: Activity;
     action: 'approve' | 'reject';
   } | null>(null);
   const [reviewNote, setReviewNote] = useState('');
-  const applicationsQuery = useQuery({
-    queryKey: ['organizer-applications'],
-    queryFn: getOrganizerApplications,
+  const activitiesQuery = useQuery({
+    queryKey: ['activities', 'pending-review'],
+    queryFn: getPendingActivityReviews,
   });
   const reviewMutation = useMutation({
     mutationFn: () =>
-      reviewOrganizerApplication(
-        reviewTarget?.application.id ?? 0,
-        reviewTarget?.action ?? 'reject',
-        reviewNote,
-      ),
+      reviewActivity(reviewTarget?.activity.id ?? 0, reviewTarget?.action ?? 'reject', reviewNote),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['organizer-applications'] });
+      await queryClient.invalidateQueries({ queryKey: ['activities', 'pending-review'] });
       setReviewTarget(null);
       setReviewNote('');
       messageApi.success('审核结果已保存');
     },
   });
+
   return (
     <section className="admin-applications">
-      <>{contextHolder}</>
+      {contextHolder}
       <header>
         <div>
           <RadioTower size={22} />
@@ -59,46 +53,46 @@ export function OrganizerApplicationsPage() {
         </Button>
       </header>
       <main>
-        <Typography.Title level={1}>主办方资质审核</Typography.Title>
-        <Typography.Paragraph>审核通过后将创建组织，并授予活动发布权限。</Typography.Paragraph>
-        {applicationsQuery.data?.length === 0 ? (
-          <Empty description="暂无待审核申请" />
+        <Typography.Title level={1}>活动审核中心</Typography.Title>
+        <Typography.Paragraph>审核通过后，活动将自动在活动广场公开发布。</Typography.Paragraph>
+        {activitiesQuery.data?.length === 0 ? (
+          <Empty description="暂无待审核活动" />
         ) : (
-          <Table<OrganizerApplication>
-            dataSource={applicationsQuery.data}
+          <Table<Activity>
+            dataSource={activitiesQuery.data}
+            loading={activitiesQuery.isLoading}
             pagination={false}
             rowKey="id"
             columns={[
-              { title: '组织名称', dataIndex: 'organizationName' },
+              { title: '活动名称', dataIndex: 'title' },
+              { title: '主办名称', dataIndex: 'organizerName' },
+              { title: '联系人', dataIndex: 'contactName' },
               {
-                title: '申请时间',
-                dataIndex: 'createTime',
-                render: (value) => new Date(value).toLocaleString('zh-CN'),
+                title: '报名时间',
+                render: (_, activity) =>
+                  formatDateRange(activity.registrationStartTime, activity.registrationEndTime),
               },
               {
                 title: '状态',
-                dataIndex: 'status',
-                render: (status) => (
-                  <Tag color="gold">{status === 'PENDING' ? '待审核' : status}</Tag>
-                ),
+                render: () => <Tag color="gold">待审核</Tag>,
               },
               {
                 title: '操作',
-                render: (_, application) => (
+                render: (_, activity) => (
                   <>
                     <Button
                       icon={<Check size={15} />}
-                      onClick={() => setReviewTarget({ application, action: 'approve' })}
+                      onClick={() => setReviewTarget({ activity, action: 'approve' })}
                       type="primary"
                     >
-                      通过
+                      通过并发布
                     </Button>
                     <Button
                       danger
                       icon={<X size={15} />}
-                      onClick={() => setReviewTarget({ application, action: 'reject' })}
+                      onClick={() => setReviewTarget({ activity, action: 'reject' })}
                     >
-                      拒绝
+                      驳回
                     </Button>
                   </>
                 ),
@@ -113,19 +107,36 @@ export function OrganizerApplicationsPage() {
           danger: reviewTarget?.action === 'reject',
           loading: reviewMutation.isPending,
         }}
-        okText={reviewTarget?.action === 'approve' ? '确认通过' : '确认拒绝'}
+        okText={reviewTarget?.action === 'approve' ? '确认通过并发布' : '确认驳回'}
         onCancel={() => setReviewTarget(null)}
-        onOk={() => reviewMutation.mutate()}
+        onOk={() => {
+          if (reviewTarget?.action === 'reject' && reviewNote.trim().length === 0) {
+            messageApi.error('驳回活动时必须填写审核原因');
+            return;
+          }
+          reviewMutation.mutate();
+        }}
         open={reviewTarget !== null}
-        title={reviewTarget?.action === 'approve' ? '确认通过主办方申请？' : '确认拒绝主办方申请？'}
+        title={reviewTarget?.action === 'approve' ? '确认通过此活动？' : '确认驳回此活动？'}
       >
         <Input.TextArea
           onChange={(event) => setReviewNote(event.target.value)}
-          placeholder="审核说明，可选"
+          placeholder={reviewTarget?.action === 'reject' ? '请填写驳回原因' : '审核说明，可选'}
           rows={3}
           value={reviewNote}
         />
       </Modal>
     </section>
   );
+}
+
+function formatDateRange(start: string, end: string): string {
+  const formatter = new Intl.DateTimeFormat('zh-CN', {
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+  return `${formatter.format(new Date(start))} 至 ${formatter.format(new Date(end))}`;
 }

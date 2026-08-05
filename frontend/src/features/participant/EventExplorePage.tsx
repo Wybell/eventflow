@@ -37,6 +37,9 @@ export function EventExplorePage() {
         </div>
         <div className="event-explore__account">
           <span>{currentUser?.displayName ?? '活动参与者'}</span>
+          <Button onClick={() => navigate('/my-activities')} type="text">
+            发布活动
+          </Button>
           <Button icon={<LogOut size={17} />} onClick={handleLogout} type="text" />
         </div>
       </header>
@@ -46,7 +49,7 @@ export function EventExplorePage() {
             <Typography.Title level={1}>探索值得到场的活动</Typography.Title>
             <Typography.Paragraph>发现公开活动，查看场次和实时可用名额。</Typography.Paragraph>
           </div>
-          <Tag className="event-explore__identity">报名视图</Tag>
+          <Tag className="event-explore__identity">活动广场</Tag>
         </section>
         <section className="event-explore__rail">
           {activitiesQuery.isLoading ? (

@@ -296,6 +296,18 @@
   color: #ffd77e;
 }
 
+.activity-workspace__status--pending_review {
+  background: rgba(131, 190, 255, 0.14);
+  border-color: rgba(131, 190, 255, 0.55);
+  color: #a9d7ff;
+}
+
+.activity-workspace__status--rejected {
+  background: rgba(255, 121, 121, 0.14);
+  border-color: rgba(255, 121, 121, 0.55);
+  color: #ffb0b0;
+}
+
 .activity-workspace__status--published {
   background: rgba(62, 235, 199, 0.14);
   border-color: rgba(62, 235, 199, 0.55);
@@ -353,6 +365,23 @@
 .activity-workspace__detail-status .activity-workspace__status--draft {
   background: #fff8e7;
   color: #a86f00;
+}
+
+.activity-workspace__detail-status .activity-workspace__status--pending_review {
+  background: #edf6ff;
+  color: #246da6;
+}
+
+.activity-workspace__detail-status .activity-workspace__status--rejected {
+  background: #fff0f0;
+  color: #b53d3d;
+}
+
+.activity-workspace__review-note {
+  background: #fff8e8;
+  border-left: 3px solid #e6a02c;
+  color: #765517;
+  padding: 10px 12px;
 }
 
 .activity-workspace__detail-status .activity-workspace__status--published {

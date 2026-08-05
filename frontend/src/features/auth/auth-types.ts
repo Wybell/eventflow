@@ -18,22 +18,14 @@ export interface CurrentUser {
   roles: string[];
 }
 
-export type RegistrationType = 'PARTICIPANT' | 'ORGANIZER';
-
 export interface RegisterInput {
-  registrationType: RegistrationType;
   username: string;
   password: string;
   displayName: string;
   mobile?: string;
   email?: string;
-  organizationName?: string;
-  organizationDescription?: string;
-  contactName?: string;
 }
 
 export interface RegistrationResponse {
   userId: number;
-  registrationType: RegistrationType;
-  organizerApplicationStatus: 'PENDING' | null;
 }

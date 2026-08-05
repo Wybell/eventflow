@@ -1,38 +1,31 @@
 import { useMutation } from '@tanstack/react-query';
-import { Button, Form, Input, Segmented, Typography, message } from 'antd';
-import { ArrowLeft, Building2, LockKeyhole, Orbit, UserPlus, UserRound } from 'lucide-react';
-import { useState } from 'react';
+import { Button, Form, Input, Typography, message } from 'antd';
+import { ArrowLeft, LockKeyhole, Orbit, UserPlus, UserRound } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { ApiError } from '../../shared/api/api-contract';
 import { useSessionStore } from '../../shared/auth/session-store';
 import { getCurrentUser, login, register } from './auth-api';
 import { defaultRouteForUser } from './auth-routing';
-import type { RegisterInput, RegistrationType } from './auth-types';
+import type { RegisterInput } from './auth-types';
 import './login-page.css';
-
-type RegisterFormValues = Omit<RegisterInput, 'registrationType'>;
 
 export function RegisterPage() {
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
-  const [registrationType, setRegistrationType] = useState<RegistrationType>('PARTICIPANT');
-  const [form] = Form.useForm<RegisterFormValues>();
   const registerMutation = useMutation({ mutationFn: register });
 
-  const handleSubmit = async (values: RegisterFormValues) => {
+  const handleSubmit = async (values: RegisterInput) => {
     try {
-      await registerMutation.mutateAsync({ ...values, registrationType });
+      await registerMutation.mutateAsync(values);
       const tokens = await login({ username: values.username, password: values.password });
       useSessionStore.getState().setAccessToken(tokens.accessToken);
       const user = await getCurrentUser();
       useSessionStore.getState().setSession(tokens.accessToken, user);
-      messageApi.success(
-        registrationType === 'ORGANIZER' ? '申请已提交，审核期间可使用报名视图。' : '账号已创建。',
-      );
+      messageApi.success('账号已创建，现在可以报名或发布活动');
       navigate(defaultRouteForUser(user), { replace: true });
     } catch (error) {
       const apiError = error as ApiError;
-      messageApi.error(apiError.message ?? '注册失败，请稍后重试。');
+      messageApi.error(apiError.message ?? '注册失败，请稍后重试');
     }
   };
 
@@ -47,9 +40,8 @@ export function RegisterPage() {
           </div>
           <span>EventFlow</span>
         </div>
-        <Form<RegisterFormValues>
+        <Form<RegisterInput>
           className="login-panel register-panel"
-          form={form}
           layout="vertical"
           requiredMark={false}
           onFinish={handleSubmit}
@@ -63,19 +55,9 @@ export function RegisterPage() {
               注册 EventFlow 账号
             </Typography.Title>
             <Typography.Paragraph>
-              选择你的使用身份，后续可在一个账号中切换不同视图。
+              创建一个账号即可报名、预约，也可以创建活动并提交平台审核。
             </Typography.Paragraph>
           </div>
-          <Segmented<RegistrationType>
-            block
-            className="register-panel__type"
-            onChange={setRegistrationType}
-            options={[
-              { label: '报名人员', value: 'PARTICIPANT', icon: <UserRound size={15} /> },
-              { label: '主办方', value: 'ORGANIZER', icon: <Building2 size={15} /> },
-            ]}
-            value={registrationType}
-          />
           <div className="register-panel__fields">
             <Form.Item
               label="账号"
@@ -108,27 +90,6 @@ export function RegisterPage() {
             >
               <Input placeholder="选填" />
             </Form.Item>
-            {registrationType === 'ORGANIZER' ? (
-              <>
-                <Form.Item
-                  label="组织名称"
-                  name="organizationName"
-                  rules={[{ required: true, message: '请输入组织名称' }]}
-                >
-                  <Input prefix={<Building2 size={17} />} placeholder="例如：EventFlow 技术社区" />
-                </Form.Item>
-                <Form.Item
-                  label="联系人"
-                  name="contactName"
-                  rules={[{ required: true, message: '请输入联系人' }]}
-                >
-                  <Input placeholder="审核联系使用" />
-                </Form.Item>
-                <Form.Item label="组织简介" name="organizationDescription">
-                  <Input.TextArea rows={3} maxLength={500} placeholder="选填" />
-                </Form.Item>
-              </>
-            ) : null}
           </div>
           <Button
             block
@@ -139,7 +100,7 @@ export function RegisterPage() {
             size="large"
             type="primary"
           >
-            {registrationType === 'ORGANIZER' ? '提交主办方申请' : '创建账号'}
+            创建账号
           </Button>
         </Form>
       </div>
