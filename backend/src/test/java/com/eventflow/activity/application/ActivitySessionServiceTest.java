@@ -34,12 +34,12 @@ class ActivitySessionServiceTest {
 
     @Test
     void shouldInitializeAllQuotaAsAvailableWhenCreatingASession() {
-        when(activityMapper.selectById(12L)).thenReturn(activity(12L, 1L, ActivityStatus.DRAFT));
+        when(activityMapper.selectById(12L)).thenReturn(activity(12L, 7L, ActivityStatus.DRAFT));
         ActivitySessionService service = new ActivitySessionService(activityMapper, activitySessionMapper);
         LocalDateTime start = LocalDateTime.of(2026, 8, 3, 9, 0);
         LocalDateTime end = LocalDateTime.of(2026, 8, 3, 10, 0);
 
-        service.create(organizer(1L), 12L, new ActivitySessionService.SessionCommand("Java 17", start, end, 80));
+        service.create(user(7L), 12L, new ActivitySessionService.SessionCommand("Java 17", start, end, 80));
 
         ArgumentCaptor<ActivitySession> sessionCaptor = ArgumentCaptor.forClass(ActivitySession.class);
         verify(activitySessionMapper).insert(sessionCaptor.capture());
@@ -51,12 +51,12 @@ class ActivitySessionServiceTest {
 
     @Test
     void shouldRejectSessionWithInvalidTimeRange() {
-        when(activityMapper.selectById(12L)).thenReturn(activity(12L, 1L, ActivityStatus.DRAFT));
+        when(activityMapper.selectById(12L)).thenReturn(activity(12L, 7L, ActivityStatus.DRAFT));
         ActivitySessionService service = new ActivitySessionService(activityMapper, activitySessionMapper);
         LocalDateTime time = LocalDateTime.of(2026, 8, 3, 9, 0);
 
         assertThatThrownBy(() -> service.create(
-                        organizer(1L), 12L, new ActivitySessionService.SessionCommand("Java 17", time, time, 80)))
+                        user(7L), 12L, new ActivitySessionService.SessionCommand("Java 17", time, time, 80)))
                 .isInstanceOf(BusinessException.class)
                 .extracting(exception -> ((BusinessException) exception).errorCode())
                 .isEqualTo(ErrorCode.INVALID_ARGUMENT);
@@ -64,15 +64,15 @@ class ActivitySessionServiceTest {
         verify(activitySessionMapper, never()).insert(any(ActivitySession.class));
     }
 
-    private Activity activity(Long id, Long organizationId, ActivityStatus status) {
+    private Activity activity(Long id, Long creatorUserId, ActivityStatus status) {
         Activity activity = new Activity();
         activity.setId(id);
-        activity.setOrganizationId(organizationId);
+        activity.setCreateUserId(creatorUserId);
         activity.setStatus(status);
         return activity;
     }
 
-    private AuthenticatedPrincipal organizer(Long organizationId) {
-        return new AuthenticatedPrincipal(7L, organizationId, Set.of("ORGANIZER"));
+    private AuthenticatedPrincipal user(Long userId) {
+        return new AuthenticatedPrincipal(userId, null, Set.of("USER"));
     }
 }

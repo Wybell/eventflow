@@ -20,6 +20,26 @@ public interface UserAccountMapper extends BaseMapper<UserAccount> {
             """)
     UserAccount findByUsername(@Param("username") String username);
 
+    @Select(
+            """
+            SELECT id, username, password_hash, display_name, mobile, email, organization_id, status,
+                   last_login_time, create_time, update_time
+            FROM ef_user
+            WHERE mobile = #{mobile}
+            LIMIT 1
+            """)
+    UserAccount findByMobile(@Param("mobile") String mobile);
+
+    @Select(
+            """
+            SELECT id, username, password_hash, display_name, mobile, email, organization_id, status,
+                   last_login_time, create_time, update_time
+            FROM ef_user
+            WHERE email = #{email}
+            LIMIT 1
+            """)
+    UserAccount findByEmail(@Param("email") String email);
+
     @Update("UPDATE ef_user SET last_login_time = #{loginTime} WHERE id = #{id}")
     int updateLastLoginTime(@Param("id") Long id, @Param("loginTime") LocalDateTime loginTime);
 

@@ -1,7 +1,6 @@
-package com.eventflow.auth.api;
+package com.eventflow.activity.api;
 
-import com.eventflow.auth.api.dto.OrganizerApplicationResponse;
-import com.eventflow.auth.application.OrganizerApplicationService;
+import com.eventflow.activity.application.ActivityService;
 import com.eventflow.shared.api.ApiResponse;
 import com.eventflow.shared.security.AuthenticatedPrincipal;
 import jakarta.validation.Valid;
@@ -16,18 +15,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/admin/organizer-applications")
-public class AdminOrganizerApplicationController {
-    private final OrganizerApplicationService organizerApplicationService;
+@RequestMapping("/api/v1/admin/activities")
+public class AdminActivityReviewController {
 
-    public AdminOrganizerApplicationController(OrganizerApplicationService organizerApplicationService) {
-        this.organizerApplicationService = organizerApplicationService;
+    private final ActivityService activityService;
+
+    public AdminActivityReviewController(ActivityService activityService) {
+        this.activityService = activityService;
     }
 
-    @GetMapping
-    public ApiResponse<List<OrganizerApplicationResponse>> listPending(
+    @GetMapping("/pending-review")
+    public ApiResponse<List<ActivityController.ActivityResponse>> listPendingReview(
             @AuthenticationPrincipal AuthenticatedPrincipal principal) {
-        return ApiResponse.success(organizerApplicationService.listPending(principal));
+        return ApiResponse.success(activityService.listPendingReview(principal).stream()
+                .map(ActivityController.ActivityResponse::from)
+                .toList());
     }
 
     @PostMapping("/{id}/approve")
@@ -35,7 +37,7 @@ public class AdminOrganizerApplicationController {
             @AuthenticationPrincipal AuthenticatedPrincipal principal,
             @PathVariable Long id,
             @Valid @RequestBody ReviewRequest request) {
-        organizerApplicationService.approve(principal, id, request.reviewNote());
+        activityService.approve(principal, id, request.reviewNote());
         return ApiResponse.success(null);
     }
 
@@ -44,7 +46,16 @@ public class AdminOrganizerApplicationController {
             @AuthenticationPrincipal AuthenticatedPrincipal principal,
             @PathVariable Long id,
             @Valid @RequestBody ReviewRequest request) {
-        organizerApplicationService.reject(principal, id, request.reviewNote());
+        activityService.reject(principal, id, request.reviewNote());
+        return ApiResponse.success(null);
+    }
+
+    @PostMapping("/{id}/offline")
+    public ApiResponse<Void> offline(
+            @AuthenticationPrincipal AuthenticatedPrincipal principal,
+            @PathVariable Long id,
+            @Valid @RequestBody ReviewRequest request) {
+        activityService.offline(principal, id, request.reviewNote());
         return ApiResponse.success(null);
     }
 

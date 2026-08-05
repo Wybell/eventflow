@@ -12,11 +12,19 @@ public class Activity {
     private Long id;
 
     private Long organizationId;
+    private String organizerName;
+    private String contactName;
+    private String contactMobile;
+    private String contactEmail;
     private String title;
     private String summary;
     private String coverUrl;
     private String venueName;
     private ActivityStatus status;
+    private String reviewNote;
+    private Long reviewUserId;
+    private LocalDateTime reviewTime;
+    private LocalDateTime publishedTime;
     private LocalDateTime registrationStartTime;
     private LocalDateTime registrationEndTime;
     private Long createUserId;
@@ -35,6 +43,38 @@ public class Activity {
 
     public void setOrganizationId(Long organizationId) {
         this.organizationId = organizationId;
+    }
+
+    public String getOrganizerName() {
+        return organizerName;
+    }
+
+    public void setOrganizerName(String organizerName) {
+        this.organizerName = organizerName;
+    }
+
+    public String getContactName() {
+        return contactName;
+    }
+
+    public void setContactName(String contactName) {
+        this.contactName = contactName;
+    }
+
+    public String getContactMobile() {
+        return contactMobile;
+    }
+
+    public void setContactMobile(String contactMobile) {
+        this.contactMobile = contactMobile;
+    }
+
+    public String getContactEmail() {
+        return contactEmail;
+    }
+
+    public void setContactEmail(String contactEmail) {
+        this.contactEmail = contactEmail;
     }
 
     public String getTitle() {
@@ -75,6 +115,38 @@ public class Activity {
 
     public void setStatus(ActivityStatus status) {
         this.status = status;
+    }
+
+    public String getReviewNote() {
+        return reviewNote;
+    }
+
+    public void setReviewNote(String reviewNote) {
+        this.reviewNote = reviewNote;
+    }
+
+    public Long getReviewUserId() {
+        return reviewUserId;
+    }
+
+    public void setReviewUserId(Long reviewUserId) {
+        this.reviewUserId = reviewUserId;
+    }
+
+    public LocalDateTime getReviewTime() {
+        return reviewTime;
+    }
+
+    public void setReviewTime(LocalDateTime reviewTime) {
+        this.reviewTime = reviewTime;
+    }
+
+    public LocalDateTime getPublishedTime() {
+        return publishedTime;
+    }
+
+    public void setPublishedTime(LocalDateTime publishedTime) {
+        this.publishedTime = publishedTime;
     }
 
     public LocalDateTime getRegistrationStartTime() {

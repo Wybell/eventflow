@@ -17,8 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ActivitySessionService {
-    private static final String ORGANIZER_ROLE = "ORGANIZER";
-
     private final ActivityMapper activityMapper;
     private final ActivitySessionMapper activitySessionMapper;
 
@@ -70,21 +68,18 @@ public class ActivitySessionService {
 
     private Activity requireDraftActivityOwnership(AuthenticatedPrincipal principal, Long activityId) {
         Activity activity = requireActivityOwnership(principal, activityId);
-        if (activity.getStatus() != ActivityStatus.DRAFT) {
+        if (activity.getStatus() != ActivityStatus.DRAFT && activity.getStatus() != ActivityStatus.REJECTED) {
             throw new BusinessException(ErrorCode.CONFLICT);
         }
         return activity;
     }
 
     private Activity requireActivityOwnership(AuthenticatedPrincipal principal, Long activityId) {
-        if (!principal.roles().contains(ORGANIZER_ROLE) || principal.organizationId() == null) {
-            throw new BusinessException(ErrorCode.FORBIDDEN);
-        }
         Activity activity = activityMapper.selectById(activityId);
         if (activity == null) {
             throw new BusinessException(ErrorCode.RESOURCE_NOT_FOUND);
         }
-        if (!activity.getOrganizationId().equals(principal.organizationId())) {
+        if (!activity.getCreateUserId().equals(principal.userId())) {
             throw new BusinessException(ErrorCode.FORBIDDEN);
         }
         return activity;

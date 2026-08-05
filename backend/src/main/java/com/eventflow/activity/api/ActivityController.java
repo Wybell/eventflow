@@ -5,8 +5,10 @@ import com.eventflow.activity.infrastructure.persistence.Activity;
 import com.eventflow.shared.api.ApiResponse;
 import com.eventflow.shared.security.AuthenticatedPrincipal;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -63,15 +65,10 @@ public class ActivityController {
         return ApiResponse.success(ActivityResponse.from(activityService.get(principal, id)));
     }
 
-    @PostMapping("/{id}/publish")
-    public ApiResponse<Void> publish(@AuthenticationPrincipal AuthenticatedPrincipal principal, @PathVariable Long id) {
-        activityService.publish(principal, id);
-        return ApiResponse.success(null);
-    }
-
-    @PostMapping("/{id}/offline")
-    public ApiResponse<Void> offline(@AuthenticationPrincipal AuthenticatedPrincipal principal, @PathVariable Long id) {
-        activityService.offline(principal, id);
+    @PostMapping("/{id}/submit-review")
+    public ApiResponse<Void> submitForReview(
+            @AuthenticationPrincipal AuthenticatedPrincipal principal, @PathVariable Long id) {
+        activityService.submitForReview(principal, id);
         return ApiResponse.success(null);
     }
 
@@ -80,12 +77,25 @@ public class ActivityController {
             @Size(max = 500) String summary,
             @Size(max = 500) String coverUrl,
             @Size(max = 120) String venueName,
+            @NotBlank @Size(max = 120) String organizerName,
+            @NotBlank @Size(max = 64) String contactName,
+            @Pattern(regexp = "^$|^[0-9+() -]{6,20}$") String contactMobile,
+            @Email @Size(max = 255) String contactEmail,
             @NotNull LocalDateTime registrationStartTime,
             @NotNull LocalDateTime registrationEndTime) {
 
         private ActivityService.ActivityCommand toCommand() {
             return new ActivityService.ActivityCommand(
-                    title, summary, coverUrl, venueName, registrationStartTime, registrationEndTime);
+                    title,
+                    summary,
+                    coverUrl,
+                    venueName,
+                    organizerName,
+                    contactName,
+                    contactMobile,
+                    contactEmail,
+                    registrationStartTime,
+                    registrationEndTime);
         }
     }
 
@@ -93,24 +103,38 @@ public class ActivityController {
 
     public record ActivityResponse(
             Long id,
-            Long organizationId,
+            Long createUserId,
             String title,
             String summary,
             String coverUrl,
             String venueName,
+            String organizerName,
+            String contactName,
+            String contactMobile,
+            String contactEmail,
             String status,
+            String reviewNote,
+            LocalDateTime reviewTime,
+            LocalDateTime publishedTime,
             LocalDateTime registrationStartTime,
             LocalDateTime registrationEndTime) {
 
-        private static ActivityResponse from(Activity activity) {
+        public static ActivityResponse from(Activity activity) {
             return new ActivityResponse(
                     activity.getId(),
-                    activity.getOrganizationId(),
+                    activity.getCreateUserId(),
                     activity.getTitle(),
                     activity.getSummary(),
                     activity.getCoverUrl(),
                     activity.getVenueName(),
+                    activity.getOrganizerName(),
+                    activity.getContactName(),
+                    activity.getContactMobile(),
+                    activity.getContactEmail(),
                     activity.getStatus().name(),
+                    activity.getReviewNote(),
+                    activity.getReviewTime(),
+                    activity.getPublishedTime(),
                     activity.getRegistrationStartTime(),
                     activity.getRegistrationEndTime());
         }
