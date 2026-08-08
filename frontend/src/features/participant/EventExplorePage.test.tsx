@@ -44,6 +44,7 @@ describe('EventExplorePage registration actions', () => {
 
     fireEvent.click(await screen.findByRole('button', { name: '查看场次' }));
 
+    expect(await screen.findByText('报名时间')).toBeInTheDocument();
     expect(await screen.findByRole('button', { name: '报名此场次' })).toBeEnabled();
   });
 
@@ -55,6 +56,8 @@ describe('EventExplorePage registration actions', () => {
 
     fireEvent.click(await screen.findByRole('button', { name: '查看场次' }));
 
+    expect(await screen.findByText('报名时间')).toBeInTheDocument();
+    expect(screen.getByText(/开放：/)).toBeInTheDocument();
     expect(await screen.findByRole('button', { name: '报名未开始' })).toBeDisabled();
   });
 

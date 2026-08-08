@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Drawer, Empty, List, Progress, Spin, Tag, Typography, message } from 'antd';
 import {
   CalendarDays,
+  CalendarClock,
   ClipboardList,
   MapPin,
   RadioTower,
@@ -157,6 +158,19 @@ export function EventExplorePage() {
               <MapPin size={16} />
               {selectedActivity.venueName || '地点待定'}
             </div>
+            <div className="event-explore__registration-window">
+              <CalendarClock size={18} />
+              <div>
+                <strong>报名时间</strong>
+                <span>
+                  {formatDateTime(selectedActivity.registrationStartTime)} 至{' '}
+                  {formatDateTime(selectedActivity.registrationEndTime)}
+                </span>
+              </div>
+              <Tag color={getRegistrationWindowStatus(selectedActivity).color}>
+                {getRegistrationWindowStatus(selectedActivity).label}
+              </Tag>
+            </div>
             <Typography.Title level={3}>可选场次</Typography.Title>
             <List
               dataSource={sessionsQuery.data ?? []}
@@ -245,14 +259,17 @@ function SessionItem({
             size="small"
           />
         </div>
-        <Button
-          disabled={action.disabled}
-          loading={isSubmitting}
-          onClick={onRegister}
-          type={action.disabled ? 'default' : 'primary'}
-        >
-          {action.label}
-        </Button>
+        <div className="event-explore__session-action">
+          <Button
+            disabled={action.disabled}
+            loading={isSubmitting}
+            onClick={onRegister}
+            type={action.disabled ? 'default' : 'primary'}
+          >
+            {action.label}
+          </Button>
+          {action.hint ? <small>{action.hint}</small> : null}
+        </div>
       </div>
     </List.Item>
   );
@@ -324,7 +341,7 @@ function getSessionAction(
   activity: Activity,
   session: ActivitySession,
   activeRegistration?: ActivityRegistration,
-): { disabled: boolean; label: string } {
+): { disabled: boolean; label: string; hint?: string } {
   if (activeRegistration) {
     return activeRegistration.sessionId === session.id
       ? { disabled: true, label: '已报名' }
@@ -332,10 +349,18 @@ function getSessionAction(
   }
   const now = Date.now();
   if (now < new Date(activity.registrationStartTime).getTime()) {
-    return { disabled: true, label: '报名未开始' };
+    return {
+      disabled: true,
+      label: '报名未开始',
+      hint: `开放：${formatDateTime(activity.registrationStartTime)}`,
+    };
   }
   if (now >= new Date(activity.registrationEndTime).getTime()) {
-    return { disabled: true, label: '报名已结束' };
+    return {
+      disabled: true,
+      label: '报名已结束',
+      hint: `截止：${formatDateTime(activity.registrationEndTime)}`,
+    };
   }
   if (now >= new Date(session.startTime).getTime()) {
     return { disabled: true, label: '场次已开始' };
@@ -346,8 +371,33 @@ function getSessionAction(
   return { disabled: false, label: '报名此场次' };
 }
 
+function getRegistrationWindowStatus(activity: Activity): {
+  color: 'default' | 'processing' | 'success' | 'error';
+  label: string;
+} {
+  const now = Date.now();
+  if (now < new Date(activity.registrationStartTime).getTime()) {
+    return { color: 'processing', label: '尚未开放' };
+  }
+  if (now >= new Date(activity.registrationEndTime).getTime()) {
+    return { color: 'error', label: '已结束' };
+  }
+  return { color: 'success', label: '报名进行中' };
+}
+
 function formatDate(value: string): string {
   return new Intl.DateTimeFormat('zh-CN', {
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(new Date(value));
+}
+
+function formatDateTime(value: string): string {
+  return new Intl.DateTimeFormat('zh-CN', {
+    year: 'numeric',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',

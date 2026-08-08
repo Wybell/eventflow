@@ -121,6 +121,34 @@
   font-size: 13px;
   margin: 20px 0 30px;
 }
+.event-explore__registration-window {
+  align-items: center;
+  background: #eaf9fc;
+  border: 1px solid #c8e9ef;
+  color: #1e6275;
+  display: flex;
+  gap: 12px;
+  margin: 0 0 28px;
+  padding: 14px 16px;
+}
+.event-explore__registration-window > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.event-explore__registration-window strong {
+  color: #12475b;
+  font-size: 14px;
+}
+.event-explore__registration-window span {
+  color: #527188;
+  font-size: 12px;
+}
+.event-explore__registration-window .ant-tag {
+  margin-left: auto;
+  margin-right: 0;
+  white-space: nowrap;
+}
 .event-explore__session {
   align-items: center;
   display: grid;
@@ -148,6 +176,18 @@
 }
 .event-explore__session .ant-btn {
   width: 116px;
+}
+.event-explore__session-action {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.event-explore__session-action small {
+  color: #7b8e9b;
+  font-size: 11px;
+  line-height: 1.4;
+  text-align: center;
 }
 .event-explore__registration {
   display: grid;
@@ -209,5 +249,14 @@
   }
   .event-explore__session .ant-btn {
     width: 100%;
+  }
+  .event-explore__session-action {
+    align-items: stretch;
+  }
+  .event-explore__registration-window {
+    align-items: flex-start;
+  }
+  .event-explore__registration-window .ant-tag {
+    margin-top: 1px;
   }
 }
