@@ -162,27 +162,11 @@ export function ActivityWorkspace() {
     setActivityDrawerOpen(true);
   };
 
-  const confirmSubmit = async (activity: Activity) => {
-    try {
-      const sessions = await getActivitySessions(activity.id);
-      if (sessions.length === 0) {
-        setSelectedActivity(activity);
-        messageApi.warning('请先添加至少一个场次和名额，再提交活动审核');
-        return;
-      }
-    } catch (error) {
-      const apiError = error as ApiError;
-      messageApi.error(apiError.message);
+  const handleSubmit = (activity: Activity) => {
+    if (submitMutation.isPending) {
       return;
     }
-
-    Modal.confirm({
-      title: '提交活动审核？',
-      content: '提交前请确认活动资料与场次配置无误。审核通过后，你可以再确认是否正式发布。',
-      okText: '提交审核',
-      cancelText: '继续编辑',
-      onOk: () => submitMutation.mutateAsync(activity.id),
-    });
+    submitMutation.mutate(activity.id);
   };
 
   const confirmPublish = (activity: Activity) => {
@@ -283,11 +267,15 @@ export function ActivityWorkspace() {
               {activitiesQuery.data.map((activity) => (
                 <ActivityRow
                   activity={activity}
+                  isSubmitDisabled={submitMutation.isPending}
+                  isSubmitting={
+                    submitMutation.isPending && submitMutation.variables === activity.id
+                  }
                   key={activity.id}
                   onEdit={() => openEditDrawer(activity)}
                   onPublish={() => confirmPublish(activity)}
                   onSelect={() => setSelectedActivity(activity)}
-                  onSubmit={() => confirmSubmit(activity)}
+                  onSubmit={() => handleSubmit(activity)}
                 />
               ))}
             </div>
@@ -499,12 +487,16 @@ function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; 
 
 function ActivityRow({
   activity,
+  isSubmitDisabled,
+  isSubmitting,
   onEdit,
   onPublish,
   onSubmit,
   onSelect,
 }: {
   activity: Activity;
+  isSubmitDisabled: boolean;
+  isSubmitting: boolean;
   onEdit: () => void;
   onPublish: () => void;
   onSubmit: () => void;
@@ -529,7 +521,13 @@ function ActivityRow({
       <div className="activity-workspace__row-actions">
         {canEdit ? <Button onClick={onEdit}>编辑</Button> : null}
         {canEdit ? (
-          <Button icon={<Send size={15} />} onClick={onSubmit} type="primary">
+          <Button
+            disabled={isSubmitDisabled}
+            icon={<Send size={15} />}
+            loading={isSubmitting}
+            onClick={onSubmit}
+            type="primary"
+          >
             提交审核
           </Button>
         ) : null}
