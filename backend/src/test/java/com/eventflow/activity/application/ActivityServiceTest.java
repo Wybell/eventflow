@@ -81,7 +81,7 @@ class ActivityServiceTest {
     }
 
     @Test
-    void shouldPublishPendingActivityWhenApprovedByAdministrator() {
+    void shouldMarkPendingActivityAsApprovedByAdministrator() {
         Activity activity = activity(18L, 7L, ActivityStatus.PENDING_REVIEW);
         when(activityMapper.selectById(18L)).thenReturn(activity);
         ActivityService service = service();
@@ -90,9 +90,36 @@ class ActivityServiceTest {
 
         ArgumentCaptor<Activity> activityCaptor = ArgumentCaptor.forClass(Activity.class);
         verify(activityMapper).updateById(activityCaptor.capture());
-        assertThat(activityCaptor.getValue().getStatus()).isEqualTo(ActivityStatus.PUBLISHED);
+        assertThat(activityCaptor.getValue().getStatus()).isEqualTo(ActivityStatus.APPROVED);
         assertThat(activityCaptor.getValue().getReviewUserId()).isEqualTo(1L);
         verify(activityReviewRecordMapper).insert(any(ActivityReviewRecord.class));
+    }
+
+    @Test
+    void shouldAllowCreatorToPublishApprovedActivity() {
+        Activity activity = activity(18L, 7L, ActivityStatus.APPROVED);
+        when(activityMapper.selectById(18L)).thenReturn(activity);
+        ActivityService service = service();
+
+        service.publish(user(7L), 18L);
+
+        ArgumentCaptor<Activity> activityCaptor = ArgumentCaptor.forClass(Activity.class);
+        verify(activityMapper).updateById(activityCaptor.capture());
+        assertThat(activityCaptor.getValue().getStatus()).isEqualTo(ActivityStatus.PUBLISHED);
+        assertThat(activityCaptor.getValue().getPublishedTime()).isEqualTo(LocalDateTime.of(2026, 8, 1, 0, 0));
+    }
+
+    @Test
+    void shouldRejectPublishingAnotherUsersApprovedActivity() {
+        when(activityMapper.selectById(18L)).thenReturn(activity(18L, 9L, ActivityStatus.APPROVED));
+        ActivityService service = service();
+
+        assertThatThrownBy(() -> service.publish(user(7L), 18L))
+                .isInstanceOf(BusinessException.class)
+                .extracting(exception -> ((BusinessException) exception).errorCode())
+                .isEqualTo(ErrorCode.FORBIDDEN);
+
+        verify(activityMapper, never()).updateById(any(Activity.class));
     }
 
     @Test

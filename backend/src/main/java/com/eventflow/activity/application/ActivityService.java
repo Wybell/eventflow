@@ -116,11 +116,11 @@ public class ActivityService {
         requireAdmin(principal);
         Activity activity = requirePendingReview(id);
         LocalDateTime now = LocalDateTime.now(clock);
-        activity.setStatus(ActivityStatus.PUBLISHED);
+        activity.setStatus(ActivityStatus.APPROVED);
         activity.setReviewNote(trimToNull(reviewNote));
         activity.setReviewUserId(principal.userId());
         activity.setReviewTime(now);
-        activity.setPublishedTime(now);
+        activity.setPublishedTime(null);
         activityMapper.updateById(activity);
         recordReview(activity.getId(), principal.userId(), "APPROVED", reviewNote);
     }
@@ -138,6 +138,18 @@ public class ActivityService {
         activity.setReviewTime(LocalDateTime.now(clock));
         activityMapper.updateById(activity);
         recordReview(activity.getId(), principal.userId(), "REJECTED", reviewNote);
+    }
+
+    @Transactional
+    public void publish(AuthenticatedPrincipal principal, Long id) {
+        Activity activity = findRequired(id);
+        requireCreator(principal, activity);
+        if (activity.getStatus() != ActivityStatus.APPROVED) {
+            throw new BusinessException(ErrorCode.CONFLICT, "只有审核通过的活动才能发布");
+        }
+        activity.setStatus(ActivityStatus.PUBLISHED);
+        activity.setPublishedTime(LocalDateTime.now(clock));
+        activityMapper.updateById(activity);
     }
 
     @Transactional

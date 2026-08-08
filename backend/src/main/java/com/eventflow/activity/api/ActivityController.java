@@ -72,6 +72,13 @@ public class ActivityController {
         return ApiResponse.success(null);
     }
 
+    @PostMapping("/{id}/publish")
+    public ApiResponse<Void> publish(
+            @AuthenticationPrincipal AuthenticatedPrincipal principal, @PathVariable Long id) {
+        activityService.publish(principal, id);
+        return ApiResponse.success(null);
+    }
+
     public record ActivityRequest(
             @NotBlank @Size(max = 120) String title,
             @Size(max = 500) String summary,

@@ -13,4 +13,5 @@ node_modules/
 pnpm-debug.log*
 
 deploy/.env
+backend/config/application-local.yml
 *.log
