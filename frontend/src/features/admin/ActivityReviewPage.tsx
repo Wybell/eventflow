@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Empty, Input, Modal, Table, Tag, Typography, message } from 'antd';
-import { Check, LogOut, RadioTower, X } from 'lucide-react';
+import { CalendarDays, Check, Compass, LogOut, RadioTower, X } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSessionStore } from '../../shared/auth/session-store';
@@ -41,16 +41,24 @@ export function ActivityReviewPage() {
           <RadioTower size={22} />
           <strong>EventFlow 管理中心</strong>
         </div>
-        <Button
-          icon={<LogOut size={17} />}
-          onClick={() => {
-            clearSession();
-            navigate('/login', { replace: true });
-          }}
-          type="text"
-        >
-          退出
-        </Button>
+        <div className="admin-applications__header-actions">
+          <Button icon={<Compass size={17} />} onClick={() => navigate('/events')} type="text">
+            活动广场
+          </Button>
+          <Button icon={<CalendarDays size={17} />} onClick={() => navigate('/my-activities')} type="text">
+            我的活动
+          </Button>
+          <Button
+            icon={<LogOut size={17} />}
+            onClick={() => {
+              clearSession();
+              navigate('/login', { replace: true });
+            }}
+            type="text"
+          >
+            退出
+          </Button>
+        </div>
       </header>
       <main>
         <Typography.Title level={1}>活动审核中心</Typography.Title>

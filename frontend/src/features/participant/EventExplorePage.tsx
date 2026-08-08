@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Button, Drawer, Empty, List, Progress, Spin, Tag, Typography } from 'antd';
-import { CalendarDays, LogOut, MapPin, RadioTower, TicketCheck } from 'lucide-react';
+import { CalendarDays, LogOut, MapPin, RadioTower, ShieldCheck, TicketCheck } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getPublishedActivities, getPublishedActivitySessions } from '../activity/activity-api';
@@ -37,6 +37,15 @@ export function EventExplorePage() {
         </div>
         <div className="event-explore__account">
           <span>{currentUser?.displayName ?? '活动参与者'}</span>
+          {currentUser?.roles.includes('ADMIN') ? (
+            <Button
+              icon={<ShieldCheck size={17} />}
+              onClick={() => navigate('/admin/activity-reviews')}
+              type="text"
+            >
+              审核中心
+            </Button>
+          ) : null}
           <Button onClick={() => navigate('/my-activities')} type="text">
             发布活动
           </Button>

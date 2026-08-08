@@ -20,6 +20,10 @@
 .admin-applications header .ant-btn {
   color: #d8faff;
 }
+.admin-applications__header-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
 .admin-applications main {
   margin: 0 auto;
   max-width: 1100px;

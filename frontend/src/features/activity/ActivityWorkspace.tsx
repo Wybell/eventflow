@@ -27,6 +27,7 @@ import {
   RadioTower,
   Rocket,
   Send,
+  ShieldCheck,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -161,7 +162,20 @@ export function ActivityWorkspace() {
     setActivityDrawerOpen(true);
   };
 
-  const confirmSubmit = (activity: Activity) => {
+  const confirmSubmit = async (activity: Activity) => {
+    try {
+      const sessions = await getActivitySessions(activity.id);
+      if (sessions.length === 0) {
+        setSelectedActivity(activity);
+        messageApi.warning('请先添加至少一个场次和名额，再提交活动审核');
+        return;
+      }
+    } catch (error) {
+      const apiError = error as ApiError;
+      messageApi.error(apiError.message);
+      return;
+    }
+
     Modal.confirm({
       title: '提交活动审核？',
       content: '提交前请确认活动资料与场次配置无误。审核通过后，你可以再确认是否正式发布。',
@@ -204,6 +218,16 @@ export function ActivityWorkspace() {
           </span>
         </button>
         <div className="activity-workspace__header-actions">
+          {currentUser?.roles.includes('ADMIN') ? (
+            <Tooltip title="活动审核中心">
+              <Button
+                icon={<ShieldCheck size={18} />}
+                onClick={() => navigate('/admin/activity-reviews')}
+              >
+                审核中心
+              </Button>
+            </Tooltip>
+          ) : null}
           <Tooltip title="活动广场">
             <Button onClick={() => navigate('/events')}>活动广场</Button>
           </Tooltip>

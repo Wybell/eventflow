@@ -66,7 +66,9 @@
 .activity-workspace__header-actions {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
+  justify-content: flex-end;
 }
 
 .activity-workspace .ant-btn-primary {
