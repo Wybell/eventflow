@@ -8,7 +8,6 @@ import {
   Input,
   InputNumber,
   List,
-  Modal,
   Progress,
   Space,
   Spin,
@@ -169,14 +168,11 @@ export function ActivityWorkspace() {
     submitMutation.mutate(activity.id);
   };
 
-  const confirmPublish = (activity: Activity) => {
-    Modal.confirm({
-      title: '正式发布活动？',
-      content: '发布后活动会出现在活动广场，报名人员即可查看并预约。',
-      okText: '确认发布',
-      cancelText: '暂不发布',
-      onOk: () => publishMutation.mutateAsync(activity.id),
-    });
+  const handlePublish = (activity: Activity) => {
+    if (publishMutation.isPending) {
+      return;
+    }
+    publishMutation.mutate(activity.id);
   };
 
   const handleLogout = () => {
@@ -267,13 +263,17 @@ export function ActivityWorkspace() {
               {activitiesQuery.data.map((activity) => (
                 <ActivityRow
                   activity={activity}
+                  isPublishDisabled={publishMutation.isPending}
+                  isPublishing={
+                    publishMutation.isPending && publishMutation.variables === activity.id
+                  }
                   isSubmitDisabled={submitMutation.isPending}
                   isSubmitting={
                     submitMutation.isPending && submitMutation.variables === activity.id
                   }
                   key={activity.id}
                   onEdit={() => openEditDrawer(activity)}
-                  onPublish={() => confirmPublish(activity)}
+                  onPublish={() => handlePublish(activity)}
                   onSelect={() => setSelectedActivity(activity)}
                   onSubmit={() => handleSubmit(activity)}
                 />
@@ -487,6 +487,8 @@ function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; 
 
 function ActivityRow({
   activity,
+  isPublishDisabled,
+  isPublishing,
   isSubmitDisabled,
   isSubmitting,
   onEdit,
@@ -495,6 +497,8 @@ function ActivityRow({
   onSelect,
 }: {
   activity: Activity;
+  isPublishDisabled: boolean;
+  isPublishing: boolean;
   isSubmitDisabled: boolean;
   isSubmitting: boolean;
   onEdit: () => void;
@@ -532,7 +536,13 @@ function ActivityRow({
           </Button>
         ) : null}
         {activity.status === 'APPROVED' ? (
-          <Button icon={<Rocket size={15} />} onClick={onPublish} type="primary">
+          <Button
+            disabled={isPublishDisabled}
+            icon={<Rocket size={15} />}
+            loading={isPublishing}
+            onClick={onPublish}
+            type="primary"
+          >
             正式发布
           </Button>
         ) : null}
