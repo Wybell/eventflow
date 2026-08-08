@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +35,7 @@ public class RegistrationService {
             ActivityMapper activityMapper,
             ActivitySessionMapper activitySessionMapper,
             ActivityRegistrationMapper registrationMapper,
-            Clock clock) {
+            @Qualifier("businessClock") Clock clock) {
         this.activityMapper = activityMapper;
         this.activitySessionMapper = activitySessionMapper;
         this.registrationMapper = registrationMapper;

@@ -22,6 +22,7 @@ import com.eventflow.shared.security.AuthenticatedPrincipal;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -80,6 +81,25 @@ class RegistrationServiceTest {
         assertConflict(() -> service.register(user(7L), command()));
 
         verify(activitySessionMapper, never()).confirmQuota(any(), any());
+    }
+
+    @Test
+    void shouldEvaluateRegistrationWindowInShanghaiTime() {
+        when(activityMapper.selectById(11L))
+                .thenReturn(activity(
+                        ActivityStatus.PUBLISHED,
+                        LocalDateTime.of(2026, 8, 8, 17, 0),
+                        LocalDateTime.of(2026, 8, 8, 17, 5)));
+        when(activitySessionMapper.selectById(21L)).thenReturn(session(LocalDateTime.of(2026, 8, 8, 20, 0), 5));
+        when(registrationMapper.selectOne(any())).thenReturn(null);
+        when(activitySessionMapper.confirmQuota(11L, 21L)).thenReturn(1);
+
+        RegistrationService service =
+                service(Clock.fixed(Instant.parse("2026-08-08T09:02:00Z"), ZoneId.of("Asia/Shanghai")));
+
+        service.register(user(7L), command());
+
+        verify(registrationMapper).insert(any(ActivityRegistration.class));
     }
 
     @Test
@@ -150,11 +170,11 @@ class RegistrationServiceTest {
     }
 
     private RegistrationService service() {
-        return new RegistrationService(
-                activityMapper,
-                activitySessionMapper,
-                registrationMapper,
-                Clock.fixed(Instant.parse("2026-08-08T12:00:00Z"), ZoneOffset.UTC));
+        return service(Clock.fixed(Instant.parse("2026-08-08T12:00:00Z"), ZoneOffset.UTC));
+    }
+
+    private RegistrationService service(Clock clock) {
+        return new RegistrationService(activityMapper, activitySessionMapper, registrationMapper, clock);
     }
 
     private Activity activity(ActivityStatus status, LocalDateTime registrationStart, LocalDateTime registrationEnd) {
