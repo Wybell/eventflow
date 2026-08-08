@@ -17,20 +17,20 @@ const USER: CurrentUser = {
 describe('session store', () => {
   beforeEach(() => {
     queryClient.clear();
-    useSessionStore.setState({ accessToken: null, currentUser: null });
+    useSessionStore.setState({ accessToken: null, refreshToken: null, currentUser: null });
   });
 
   it('clears cached server data when replacing the authenticated user', () => {
     queryClient.setQueryData(['activities', 'mine', 1], [{ id: 18 }]);
 
-    useSessionStore.getState().setSession('new-token', USER);
+    useSessionStore.getState().setSession('new-token', 'refresh-token', USER);
 
     expect(queryClient.getQueryData(['activities', 'mine', 1])).toBeUndefined();
   });
 
   it('clears cached server data when signing out', () => {
     queryClient.setQueryData(['activities', 'mine', USER.id], [{ id: 23 }]);
-    useSessionStore.setState({ accessToken: 'token', currentUser: USER });
+    useSessionStore.setState({ accessToken: 'token', refreshToken: 'refresh', currentUser: USER });
 
     useSessionStore.getState().clearSession();
 

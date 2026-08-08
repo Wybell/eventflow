@@ -4,6 +4,26 @@ import type { ApiError, ApiResponse } from './api-contract';
 import { createRequestId } from './request-id';
 
 const REQUEST_ID_HEADER = 'X-Request-Id';
+const REFRESH_EXCLUDED_PATHS = [
+  '/v1/auth/login',
+  '/v1/auth/logout',
+  '/v1/auth/refresh',
+  '/v1/auth/register',
+];
+
+interface AuthTokenResponsePayload {
+  accessToken: string;
+  refreshToken: string;
+  tokenType: string;
+  expiresIn: number;
+}
+
+const refreshClient = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api',
+  timeout: 10_000,
+});
+
+let refreshPromise: Promise<string | null> | null = null;
 
 export const httpClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api',
@@ -21,8 +41,53 @@ httpClient.interceptors.request.use((config) => {
 
 httpClient.interceptors.response.use(
   (response) => response,
-  (error: unknown) => Promise.reject(toApiError(error)),
+  async (error: unknown) => {
+    if (axios.isAxiosError(error) && error.response?.status === 401 && error.config !== undefined) {
+      const retryConfig = error.config as typeof error.config & { _retry?: boolean };
+      if (!retryConfig._retry && !isRefreshExcludedPath(retryConfig.url)) {
+        retryConfig._retry = true;
+        const accessToken = await refreshAccessToken();
+        if (accessToken !== null) {
+          retryConfig.headers.set('Authorization', `Bearer ${accessToken}`);
+          return httpClient.request(retryConfig);
+        }
+      }
+    }
+    return Promise.reject(toApiError(error));
+  },
 );
+
+async function refreshAccessToken(): Promise<string | null> {
+  const refreshToken = useSessionStore.getState().refreshToken;
+  if (refreshToken === null || refreshToken === undefined) {
+    return null;
+  }
+  if (refreshPromise === null) {
+    refreshPromise = refreshClient
+      .post<ApiResponse<AuthTokenResponsePayload>>('/v1/auth/refresh', { refreshToken })
+      .then((response) => {
+        const tokens = response.data.data;
+        useSessionStore.getState().updateTokens(tokens.accessToken, tokens.refreshToken);
+        return tokens.accessToken;
+      })
+      .catch(() => {
+        useSessionStore.getState().clearSession();
+        return null;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+}
+
+function isRefreshExcludedPath(url: string | undefined): boolean {
+  if (url === undefined) {
+    return false;
+  }
+  const path = url.split('?')[0];
+  return REFRESH_EXCLUDED_PATHS.some((endpoint) => path.endsWith(endpoint));
+}
 
 export function toApiError(error: unknown): ApiError {
   if (!axios.isAxiosError(error)) {

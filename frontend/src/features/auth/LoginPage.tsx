@@ -19,7 +19,7 @@ export function LoginPage() {
       const tokens = await loginMutation.mutateAsync(values);
       useSessionStore.getState().setAccessToken(tokens.accessToken);
       const user = await getCurrentUser();
-      setSession(tokens.accessToken, user);
+      setSession(tokens.accessToken, tokens.refreshToken, user);
       navigate(defaultRouteForUser(user), { replace: true });
     } catch {
       // The form renders the normalized server error below the submit action.

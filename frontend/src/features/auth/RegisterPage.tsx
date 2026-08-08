@@ -20,7 +20,7 @@ export function RegisterPage() {
       const tokens = await login({ username: values.username, password: values.password });
       useSessionStore.getState().setAccessToken(tokens.accessToken);
       const user = await getCurrentUser();
-      useSessionStore.getState().setSession(tokens.accessToken, user);
+      useSessionStore.getState().setSession(tokens.accessToken, tokens.refreshToken, user);
       messageApi.success('账号已创建，现在可以报名或发布活动');
       navigate(defaultRouteForUser(user), { replace: true });
     } catch (error) {
