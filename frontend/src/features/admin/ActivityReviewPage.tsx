@@ -54,7 +54,7 @@ export function ActivityReviewPage() {
       </header>
       <main>
         <Typography.Title level={1}>活动审核中心</Typography.Title>
-        <Typography.Paragraph>审核通过后，活动将自动在活动广场公开发布。</Typography.Paragraph>
+        <Typography.Paragraph>审核通过后，活动发起者确认后手动发布。</Typography.Paragraph>
         {activitiesQuery.data?.length === 0 ? (
           <Empty description="暂无待审核活动" />
         ) : (
@@ -85,7 +85,7 @@ export function ActivityReviewPage() {
                       onClick={() => setReviewTarget({ activity, action: 'approve' })}
                       type="primary"
                     >
-                      通过并发布
+                      通过审核
                     </Button>
                     <Button
                       danger
@@ -107,7 +107,7 @@ export function ActivityReviewPage() {
           danger: reviewTarget?.action === 'reject',
           loading: reviewMutation.isPending,
         }}
-        okText={reviewTarget?.action === 'approve' ? '确认通过并发布' : '确认驳回'}
+        okText={reviewTarget?.action === 'approve' ? '确认通过' : '确认驳回'}
         onCancel={() => setReviewTarget(null)}
         onOk={() => {
           if (reviewTarget?.action === 'reject' && reviewNote.trim().length === 0) {

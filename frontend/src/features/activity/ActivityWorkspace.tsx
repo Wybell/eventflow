@@ -37,6 +37,7 @@ import {
   createActivitySession,
   getActivitySessions,
   getMyActivities,
+  publishActivity,
   submitActivityForReview,
   updateActivity,
 } from './activity-api';
@@ -111,7 +112,17 @@ export function ActivityWorkspace() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ACTIVITY_QUERY_KEY });
       setSelectedActivity(null);
-      messageApi.success('活动已提交审核，通过后将自动公开发布');
+      messageApi.success('活动已提交审核，审核通过后等待你确认发布');
+    },
+    onError: (error: ApiError) => messageApi.error(error.message),
+  });
+
+  const publishMutation = useMutation({
+    mutationFn: publishActivity,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ACTIVITY_QUERY_KEY });
+      setSelectedActivity(null);
+      messageApi.success('活动已正式发布到活动广场');
     },
     onError: (error: ApiError) => messageApi.error(error.message),
   });
@@ -153,10 +164,20 @@ export function ActivityWorkspace() {
   const confirmSubmit = (activity: Activity) => {
     Modal.confirm({
       title: '提交活动审核？',
-      content: '提交前请确认活动资料与场次配置无误。审核通过后，活动将自动公开发布。',
+      content: '提交前请确认活动资料与场次配置无误。审核通过后，你可以再确认是否正式发布。',
       okText: '提交审核',
       cancelText: '继续编辑',
       onOk: () => submitMutation.mutateAsync(activity.id),
+    });
+  };
+
+  const confirmPublish = (activity: Activity) => {
+    Modal.confirm({
+      title: '正式发布活动？',
+      content: '发布后活动会出现在活动广场，报名人员即可查看并预约。',
+      okText: '确认发布',
+      cancelText: '暂不发布',
+      onOk: () => publishMutation.mutateAsync(activity.id),
     });
   };
 
@@ -240,6 +261,7 @@ export function ActivityWorkspace() {
                   activity={activity}
                   key={activity.id}
                   onEdit={() => openEditDrawer(activity)}
+                  onPublish={() => confirmPublish(activity)}
                   onSelect={() => setSelectedActivity(activity)}
                   onSubmit={() => confirmSubmit(activity)}
                 />
@@ -454,11 +476,13 @@ function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; 
 function ActivityRow({
   activity,
   onEdit,
+  onPublish,
   onSubmit,
   onSelect,
 }: {
   activity: Activity;
   onEdit: () => void;
+  onPublish: () => void;
   onSubmit: () => void;
   onSelect: () => void;
 }) {
@@ -485,6 +509,11 @@ function ActivityRow({
             提交审核
           </Button>
         ) : null}
+        {activity.status === 'APPROVED' ? (
+          <Button icon={<Rocket size={15} />} onClick={onPublish} type="primary">
+            正式发布
+          </Button>
+        ) : null}
       </div>
     </article>
   );
@@ -494,6 +523,7 @@ function StatusTag({ status }: { status: Activity['status'] }) {
   const labels: Record<Activity['status'], string> = {
     DRAFT: '草稿待配置',
     PENDING_REVIEW: '审核中',
+    APPROVED: '审核通过，待发布',
     REJECTED: '已驳回，待修改',
     PUBLISHED: '已公开发布',
     OFFLINE: '已下架',

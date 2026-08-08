@@ -6,7 +6,7 @@
 
 .login-page__scene {
   background-image: url('/login-portal-background.png');
-  background-position: center 35%;
+  background-position: center 10%;
   background-repeat: no-repeat;
   background-size: cover;
   inset: 0;
@@ -177,7 +177,7 @@
 
 @media (max-width: 720px) {
   .login-page__scene {
-    background-position: 42% 28%;
+    background-position: 42% 10%;
   }
 
   .login-page__content {

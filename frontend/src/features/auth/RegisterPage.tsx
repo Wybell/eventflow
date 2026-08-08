@@ -76,9 +76,9 @@ export function RegisterPage() {
             <Form.Item
               label="密码"
               name="password"
-              rules={[{ required: true, min: 8, message: '密码至少 8 位' }]}
+              rules={[{ required: true, min: 6, message: '密码至少 6 位' }]}
             >
-              <Input.Password prefix={<LockKeyhole size={17} />} placeholder="至少 8 位" />
+              <Input.Password prefix={<LockKeyhole size={17} />} placeholder="至少 6 位" />
             </Form.Item>
             <Form.Item label="手机号" name="mobile">
               <Input placeholder="选填" />

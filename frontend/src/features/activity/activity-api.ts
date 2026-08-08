@@ -34,6 +34,10 @@ export async function submitActivityForReview(id: number): Promise<void> {
   await httpClient.post<ApiResponse<null>>(`/v1/activities/${id}/submit-review`);
 }
 
+export async function publishActivity(id: number): Promise<void> {
+  await httpClient.post<ApiResponse<null>>(`/v1/activities/${id}/publish`);
+}
+
 export async function getActivitySessions(activityId: number): Promise<ActivitySession[]> {
   const response = await httpClient.get<ApiResponse<ActivitySession[]>>(
     `/v1/activities/${activityId}/sessions`,

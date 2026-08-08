@@ -302,6 +302,12 @@
   color: #a9d7ff;
 }
 
+.activity-workspace__status--approved {
+  background: rgba(179, 145, 255, 0.15);
+  border-color: rgba(179, 145, 255, 0.58);
+  color: #d4bfff;
+}
+
 .activity-workspace__status--rejected {
   background: rgba(255, 121, 121, 0.14);
   border-color: rgba(255, 121, 121, 0.55);
@@ -370,6 +376,11 @@
 .activity-workspace__detail-status .activity-workspace__status--pending_review {
   background: #edf6ff;
   color: #246da6;
+}
+
+.activity-workspace__detail-status .activity-workspace__status--approved {
+  background: #f2edff;
+  color: #6845a7;
 }
 
 .activity-workspace__detail-status .activity-workspace__status--rejected {

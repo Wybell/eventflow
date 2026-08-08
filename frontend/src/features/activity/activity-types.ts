@@ -1,4 +1,10 @@
-export type ActivityStatus = 'DRAFT' | 'PENDING_REVIEW' | 'REJECTED' | 'PUBLISHED' | 'OFFLINE';
+export type ActivityStatus =
+  | 'DRAFT'
+  | 'PENDING_REVIEW'
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'PUBLISHED'
+  | 'OFFLINE';
 
 export interface Activity {
   id: number;
