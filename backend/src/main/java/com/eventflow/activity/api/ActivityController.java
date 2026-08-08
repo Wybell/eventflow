@@ -53,9 +53,9 @@ public class ActivityController {
     }
 
     @GetMapping("/public")
-    public ApiResponse<List<ActivityResponse>> listPublished() {
+    public ApiResponse<List<PublicActivityResponse>> listPublished() {
         return ApiResponse.success(activityService.listPublished().stream()
-                .map(ActivityResponse::from)
+                .map(PublicActivityResponse::from)
                 .toList());
     }
 
@@ -141,6 +141,29 @@ public class ActivityController {
                     activity.getReviewNote(),
                     activity.getReviewTime(),
                     activity.getPublishedTime(),
+                    activity.getRegistrationStartTime(),
+                    activity.getRegistrationEndTime());
+        }
+    }
+
+    public record PublicActivityResponse(
+            Long id,
+            String title,
+            String summary,
+            String coverUrl,
+            String venueName,
+            String organizerName,
+            LocalDateTime registrationStartTime,
+            LocalDateTime registrationEndTime) {
+
+        public static PublicActivityResponse from(Activity activity) {
+            return new PublicActivityResponse(
+                    activity.getId(),
+                    activity.getTitle(),
+                    activity.getSummary(),
+                    activity.getCoverUrl(),
+                    activity.getVenueName(),
+                    activity.getOrganizerName(),
                     activity.getRegistrationStartTime(),
                     activity.getRegistrationEndTime());
         }

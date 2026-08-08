@@ -25,6 +25,17 @@ export interface Activity {
   registrationEndTime: string;
 }
 
+export interface PublicActivity {
+  id: number;
+  title: string;
+  summary: string | null;
+  coverUrl: string | null;
+  venueName: string | null;
+  organizerName: string;
+  registrationStartTime: string;
+  registrationEndTime: string;
+}
+
 export interface ActivityInput {
   title: string;
   summary?: string;

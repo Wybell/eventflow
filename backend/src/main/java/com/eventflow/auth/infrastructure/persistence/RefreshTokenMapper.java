@@ -16,10 +16,10 @@ public interface RefreshTokenMapper extends BaseMapper<RefreshToken> {
             FROM ef_refresh_token
             WHERE token_hash = #{tokenHash}
               AND revoked_time IS NULL
-              AND expires_time > UTC_TIMESTAMP(3)
+              AND expires_time > #{now}
             LIMIT 1
             """)
-    RefreshToken findActiveByTokenHash(@Param("tokenHash") String tokenHash);
+    RefreshToken findActiveByTokenHash(@Param("tokenHash") String tokenHash, @Param("now") LocalDateTime now);
 
     @Update(
             """

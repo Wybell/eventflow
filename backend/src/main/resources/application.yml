@@ -1,8 +1,6 @@
 spring:
   application:
     name: eventflow
-  profiles:
-    default: local
   main:
     banner-mode: "off"
   servlet:

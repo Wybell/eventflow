@@ -114,10 +114,22 @@ public class ActivityService {
     @Transactional(readOnly = true)
     public Activity get(AuthenticatedPrincipal principal, Long id) {
         Activity activity = findRequired(id);
-        if (!hasRole(principal, ADMIN_ROLE) && !activity.getCreateUserId().equals(principal.userId())) {
+        if (activity.getCreateUserId().equals(principal.userId())) {
+            return activity;
+        }
+        if (!hasRole(principal, ADMIN_ROLE)
+                || (activity.getStatus() != ActivityStatus.PENDING_REVIEW
+                        && !hasReviewedActivity(principal, activity.getId()))) {
             throw new BusinessException(ErrorCode.FORBIDDEN);
         }
         return activity;
+    }
+
+    private boolean hasReviewedActivity(AuthenticatedPrincipal principal, Long activityId) {
+        return activityReviewRecordMapper.selectCount(new LambdaQueryWrapper<ActivityReviewRecord>()
+                        .eq(ActivityReviewRecord::getActivityId, activityId)
+                        .eq(ActivityReviewRecord::getReviewerUserId, principal.userId()))
+                > 0;
     }
 
     @Transactional

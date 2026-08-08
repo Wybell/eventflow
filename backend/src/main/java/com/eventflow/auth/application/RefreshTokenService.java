@@ -43,7 +43,7 @@ public class RefreshTokenService {
     }
 
     public Long rotate(String token) {
-        RefreshToken refreshToken = refreshTokenMapper.findActiveByTokenHash(hash(token));
+        RefreshToken refreshToken = refreshTokenMapper.findActiveByTokenHash(hash(token), LocalDateTime.now(clock));
         if (refreshToken == null
                 || refreshTokenMapper.revokeById(refreshToken.getId(), LocalDateTime.now(clock)) != 1) {
             throw new BusinessException(ErrorCode.REFRESH_TOKEN_INVALID);
@@ -52,7 +52,7 @@ public class RefreshTokenService {
     }
 
     public void revoke(String token) {
-        RefreshToken refreshToken = refreshTokenMapper.findActiveByTokenHash(hash(token));
+        RefreshToken refreshToken = refreshTokenMapper.findActiveByTokenHash(hash(token), LocalDateTime.now(clock));
         if (refreshToken != null) {
             refreshTokenMapper.revokeById(refreshToken.getId(), LocalDateTime.now(clock));
         }

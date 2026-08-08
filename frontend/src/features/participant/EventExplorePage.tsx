@@ -13,7 +13,7 @@ import {
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getPublishedActivities, getPublishedActivitySessions } from '../activity/activity-api';
-import type { Activity, ActivitySession } from '../activity/activity-types';
+import type { ActivitySession, PublicActivity } from '../activity/activity-types';
 import { ProfileMenu } from '../profile/ProfileMenu';
 import {
   cancelRegistration,
@@ -30,7 +30,7 @@ export function EventExplorePage() {
   const queryClient = useQueryClient();
   const currentUser = useSessionStore((state) => state.currentUser);
   const [messageApi, contextHolder] = message.useMessage();
-  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  const [selectedActivity, setSelectedActivity] = useState<PublicActivity | null>(null);
   const [isRegistrationsOpen, setRegistrationsOpen] = useState(false);
   const registrationQueryKey = ['registrations', 'mine', currentUser?.id] as const;
 
@@ -232,7 +232,7 @@ function SessionItem({
   session,
 }: {
   activeRegistration?: ActivityRegistration;
-  activity: Activity;
+  activity: PublicActivity;
   isSubmitting: boolean;
   onRegister: () => void;
   session: ActivitySession;
@@ -312,7 +312,7 @@ function RegistrationItem({
   );
 }
 
-function ActivityCard({ activity, onSelect }: { activity: Activity; onSelect: () => void }) {
+function ActivityCard({ activity, onSelect }: { activity: PublicActivity; onSelect: () => void }) {
   return (
     <article className="event-explore__card">
       <div className="event-explore__card-index">{String(activity.id).padStart(2, '0')}</div>
@@ -338,7 +338,7 @@ function ActivityCard({ activity, onSelect }: { activity: Activity; onSelect: ()
 }
 
 function getSessionAction(
-  activity: Activity,
+  activity: PublicActivity,
   session: ActivitySession,
   activeRegistration?: ActivityRegistration,
 ): { disabled: boolean; label: string; hint?: string } {
@@ -371,7 +371,7 @@ function getSessionAction(
   return { disabled: false, label: '报名此场次' };
 }
 
-function getRegistrationWindowStatus(activity: Activity): {
+function getRegistrationWindowStatus(activity: PublicActivity): {
   color: 'default' | 'processing' | 'success' | 'error';
   label: string;
 } {

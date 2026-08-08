@@ -5,6 +5,7 @@ import type {
   ActivityInput,
   ActivitySession,
   ActivitySessionInput,
+  PublicActivity,
 } from './activity-types';
 
 interface IdResponse {
@@ -16,8 +17,8 @@ export async function getMyActivities(): Promise<Activity[]> {
   return response.data.data;
 }
 
-export async function getPublishedActivities(): Promise<Activity[]> {
-  const response = await httpClient.get<ApiResponse<Activity[]>>('/v1/activities/public');
+export async function getPublishedActivities(): Promise<PublicActivity[]> {
+  const response = await httpClient.get<ApiResponse<PublicActivity[]>>('/v1/activities/public');
   return response.data.data;
 }
 

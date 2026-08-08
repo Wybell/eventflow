@@ -1,0 +1,23 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: ${EVENTFLOW_DB_URL}
+    username: ${EVENTFLOW_DB_USERNAME}
+    password: ${EVENTFLOW_DB_PASSWORD}
+  data:
+    redis:
+      host: ${EVENTFLOW_REDIS_HOST}
+      port: ${EVENTFLOW_REDIS_PORT:6379}
+  rabbitmq:
+    host: ${EVENTFLOW_RABBITMQ_HOST}
+    port: ${EVENTFLOW_RABBITMQ_PORT:5672}
+    username: ${EVENTFLOW_RABBITMQ_USERNAME}
+    password: ${EVENTFLOW_RABBITMQ_PASSWORD}
+
+eventflow:
+  security:
+    jwt:
+      issuer: ${EVENTFLOW_JWT_ISSUER:eventflow}
+      secret: ${EVENTFLOW_JWT_SECRET}
