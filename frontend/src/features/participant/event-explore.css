@@ -123,8 +123,9 @@
 }
 .event-explore__session {
   align-items: center;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(150px, 1fr) 140px 116px;
   width: 100%;
 }
 .event-explore__session strong,
@@ -138,13 +139,39 @@
   font-size: 12px;
   margin-top: 5px;
 }
-.event-explore__session > div:last-child {
-  min-width: 150px;
+.event-explore__session-quota {
   text-align: right;
 }
 .event-explore__session b {
   color: #047e9d;
   font-size: 19px;
+}
+.event-explore__session .ant-btn {
+  width: 116px;
+}
+.event-explore__registration {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+.event-explore__registration-heading {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+.event-explore__registration > span {
+  color: #5f7a8e;
+  font-size: 13px;
+}
+.event-explore__registration-venue {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+.event-explore__registration .ant-btn {
+  justify-self: start;
+  margin-top: 6px;
 }
 @media (max-width: 680px) {
   .event-explore__header {
@@ -173,11 +200,14 @@
   }
   .event-explore__session {
     align-items: start;
-    flex-direction: column;
+    grid-template-columns: 1fr;
     gap: 10px;
   }
-  .event-explore__session > div:last-child {
+  .event-explore__session-quota {
     text-align: left;
+    width: 100%;
+  }
+  .event-explore__session .ant-btn {
     width: 100%;
   }
 }

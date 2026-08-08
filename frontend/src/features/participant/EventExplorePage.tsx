@@ -1,18 +1,38 @@
-import { useQuery } from '@tanstack/react-query';
-import { Button, Drawer, Empty, List, Progress, Spin, Tag, Typography } from 'antd';
-import { CalendarDays, MapPin, RadioTower, ShieldCheck, TicketCheck } from 'lucide-react';
-import { useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Button, Drawer, Empty, List, Progress, Spin, Tag, Typography, message } from 'antd';
+import {
+  CalendarDays,
+  ClipboardList,
+  MapPin,
+  RadioTower,
+  ShieldCheck,
+  TicketCheck,
+  XCircle,
+} from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getPublishedActivities, getPublishedActivitySessions } from '../activity/activity-api';
-import type { Activity } from '../activity/activity-types';
+import type { Activity, ActivitySession } from '../activity/activity-types';
 import { ProfileMenu } from '../profile/ProfileMenu';
+import {
+  cancelRegistration,
+  getMyRegistrations,
+  registerForActivity,
+} from '../registration/registration-api';
+import type { ActivityRegistration } from '../registration/registration-types';
+import type { ApiError } from '../../shared/api/api-contract';
 import { useSessionStore } from '../../shared/auth/session-store';
 import './event-explore.css';
 
 export function EventExplorePage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const currentUser = useSessionStore((state) => state.currentUser);
+  const [messageApi, contextHolder] = message.useMessage();
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  const [isRegistrationsOpen, setRegistrationsOpen] = useState(false);
+  const registrationQueryKey = ['registrations', 'mine', currentUser?.id] as const;
+
   const activitiesQuery = useQuery({
     queryKey: ['activities', 'public'],
     queryFn: getPublishedActivities,
@@ -22,9 +42,51 @@ export function EventExplorePage() {
     queryFn: () => getPublishedActivitySessions(selectedActivity?.id ?? 0),
     enabled: selectedActivity !== null,
   });
+  const registrationsQuery = useQuery({
+    queryKey: registrationQueryKey,
+    queryFn: getMyRegistrations,
+    enabled: currentUser !== null,
+  });
+  const activeRegistrations = useMemo(
+    () =>
+      new Map(
+        (registrationsQuery.data ?? [])
+          .filter((registration) => registration.status === 'CONFIRMED')
+          .map((registration) => [registration.activityId, registration]),
+      ),
+    [registrationsQuery.data],
+  );
+
+  const registrationMutation = useMutation({
+    mutationFn: registerForActivity,
+    onSuccess: async (_, input) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: registrationQueryKey }),
+        queryClient.invalidateQueries({
+          queryKey: ['activity-sessions', 'public', input.activityId],
+        }),
+      ]);
+      messageApi.success('报名成功，已加入“我的报名”');
+    },
+    onError: (error: ApiError) => messageApi.error(error.message),
+  });
+  const cancellationMutation = useMutation({
+    mutationFn: (registration: ActivityRegistration) => cancelRegistration(registration.id),
+    onSuccess: async (_, registration) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: registrationQueryKey }),
+        queryClient.invalidateQueries({
+          queryKey: ['activity-sessions', 'public', registration.activityId],
+        }),
+      ]);
+      messageApi.success('报名已取消，名额已归还');
+    },
+    onError: (error: ApiError) => messageApi.error(error.message),
+  });
 
   return (
     <section className="event-explore" aria-label="活动发现">
+      {contextHolder}
       <header className="event-explore__header">
         <div className="event-explore__brand">
           <RadioTower size={23} />
@@ -32,6 +94,13 @@ export function EventExplorePage() {
         </div>
         <div className="event-explore__account">
           <ProfileMenu />
+          <Button
+            icon={<ClipboardList size={17} />}
+            onClick={() => setRegistrationsOpen(true)}
+            type="text"
+          >
+            我的报名
+          </Button>
           {currentUser?.roles.includes('ADMIN') ? (
             <Button
               icon={<ShieldCheck size={17} />}
@@ -74,11 +143,10 @@ export function EventExplorePage() {
       </main>
       <Drawer
         className="event-explore__drawer"
-        closeIcon={null}
         onClose={() => setSelectedActivity(null)}
         open={selectedActivity !== null}
         title={selectedActivity?.title}
-        width={560}
+        width={600}
       >
         {selectedActivity ? (
           <>
@@ -93,33 +161,137 @@ export function EventExplorePage() {
             <List
               dataSource={sessionsQuery.data ?? []}
               loading={sessionsQuery.isLoading}
-              locale={{ emptyText: '主办方暂未发布可预约场次' }}
+              locale={{ emptyText: '主办方暂未发布可报名场次' }}
               renderItem={(session) => (
-                <List.Item>
-                  <div className="event-explore__session">
-                    <div>
-                      <strong>{session.title}</strong>
-                      <span>
-                        {formatDate(session.startTime)} 至 {formatDate(session.endTime)}
-                      </span>
-                    </div>
-                    <div>
-                      <b>{session.availableQuota}</b>
-                      <small> 个可用名额</small>
-                      <Progress
-                        percent={Math.round((session.availableQuota / session.totalQuota) * 100)}
-                        showInfo={false}
-                        size="small"
-                      />
-                    </div>
-                  </div>
-                </List.Item>
+                <SessionItem
+                  activeRegistration={activeRegistrations.get(selectedActivity.id)}
+                  activity={selectedActivity}
+                  isSubmitting={
+                    registrationMutation.isPending &&
+                    registrationMutation.variables?.sessionId === session.id
+                  }
+                  onRegister={() =>
+                    registrationMutation.mutate({
+                      activityId: selectedActivity.id,
+                      sessionId: session.id,
+                    })
+                  }
+                  session={session}
+                />
               )}
             />
           </>
         ) : null}
       </Drawer>
+      <Drawer
+        className="event-explore__drawer"
+        onClose={() => setRegistrationsOpen(false)}
+        open={isRegistrationsOpen}
+        title="我的报名"
+        width={520}
+      >
+        <List
+          dataSource={registrationsQuery.data ?? []}
+          loading={registrationsQuery.isLoading}
+          locale={{ emptyText: '还没有报名记录' }}
+          renderItem={(registration) => (
+            <RegistrationItem
+              isCancelling={
+                cancellationMutation.isPending &&
+                cancellationMutation.variables?.id === registration.id
+              }
+              onCancel={() => cancellationMutation.mutate(registration)}
+              registration={registration}
+            />
+          )}
+        />
+      </Drawer>
     </section>
+  );
+}
+
+function SessionItem({
+  activeRegistration,
+  activity,
+  isSubmitting,
+  onRegister,
+  session,
+}: {
+  activeRegistration?: ActivityRegistration;
+  activity: Activity;
+  isSubmitting: boolean;
+  onRegister: () => void;
+  session: ActivitySession;
+}) {
+  const action = getSessionAction(activity, session, activeRegistration);
+
+  return (
+    <List.Item>
+      <div className="event-explore__session">
+        <div className="event-explore__session-copy">
+          <strong>{session.title}</strong>
+          <span>
+            {formatDate(session.startTime)} 至 {formatDate(session.endTime)}
+          </span>
+        </div>
+        <div className="event-explore__session-quota">
+          <span>
+            <b>{session.availableQuota}</b>
+            <small> 个可用名额</small>
+          </span>
+          <Progress
+            percent={Math.round((session.availableQuota / session.totalQuota) * 100)}
+            showInfo={false}
+            size="small"
+          />
+        </div>
+        <Button
+          disabled={action.disabled}
+          loading={isSubmitting}
+          onClick={onRegister}
+          type={action.disabled ? 'default' : 'primary'}
+        >
+          {action.label}
+        </Button>
+      </div>
+    </List.Item>
+  );
+}
+
+function RegistrationItem({
+  isCancelling,
+  onCancel,
+  registration,
+}: {
+  isCancelling: boolean;
+  onCancel: () => void;
+  registration: ActivityRegistration;
+}) {
+  const isConfirmed = registration.status === 'CONFIRMED';
+  return (
+    <List.Item>
+      <div className="event-explore__registration">
+        <div className="event-explore__registration-heading">
+          <strong>{registration.activityTitle}</strong>
+          <Tag color={isConfirmed ? 'success' : 'default'}>
+            {isConfirmed ? '报名成功' : '已取消'}
+          </Tag>
+        </div>
+        <span>{registration.sessionTitle}</span>
+        <span>
+          {formatDate(registration.sessionStartTime)} 至 {formatDate(registration.sessionEndTime)}
+        </span>
+        <span className="event-explore__registration-venue">
+          <MapPin size={14} />
+          {registration.venueName || '地点待定'}
+        </span>
+        {isConfirmed ? (
+          <Button danger icon={<XCircle size={16} />} loading={isCancelling} onClick={onCancel}>
+            取消报名
+          </Button>
+        ) : null}
+      </div>
+    </List.Item>
   );
 }
 
@@ -146,6 +318,32 @@ function ActivityCard({ activity, onSelect }: { activity: Activity; onSelect: ()
       </Button>
     </article>
   );
+}
+
+function getSessionAction(
+  activity: Activity,
+  session: ActivitySession,
+  activeRegistration?: ActivityRegistration,
+): { disabled: boolean; label: string } {
+  if (activeRegistration) {
+    return activeRegistration.sessionId === session.id
+      ? { disabled: true, label: '已报名' }
+      : { disabled: true, label: '已选其他场次' };
+  }
+  const now = Date.now();
+  if (now < new Date(activity.registrationStartTime).getTime()) {
+    return { disabled: true, label: '报名未开始' };
+  }
+  if (now >= new Date(activity.registrationEndTime).getTime()) {
+    return { disabled: true, label: '报名已结束' };
+  }
+  if (now >= new Date(session.startTime).getTime()) {
+    return { disabled: true, label: '场次已开始' };
+  }
+  if (session.availableQuota <= 0) {
+    return { disabled: true, label: '名额已满' };
+  }
+  return { disabled: false, label: '报名此场次' };
 }
 
 function formatDate(value: string): string {
