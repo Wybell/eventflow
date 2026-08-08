@@ -12,7 +12,7 @@ public interface UserAccountMapper extends BaseMapper<UserAccount> {
 
     @Select(
             """
-            SELECT id, username, password_hash, display_name, mobile, email, organization_id, status,
+            SELECT id, username, password_hash, display_name, avatar_url, mobile, email, organization_id, status,
                    last_login_time, create_time, update_time
             FROM ef_user
             WHERE username = #{username}
@@ -22,7 +22,7 @@ public interface UserAccountMapper extends BaseMapper<UserAccount> {
 
     @Select(
             """
-            SELECT id, username, password_hash, display_name, mobile, email, organization_id, status,
+            SELECT id, username, password_hash, display_name, avatar_url, mobile, email, organization_id, status,
                    last_login_time, create_time, update_time
             FROM ef_user
             WHERE mobile = #{mobile}
@@ -32,7 +32,7 @@ public interface UserAccountMapper extends BaseMapper<UserAccount> {
 
     @Select(
             """
-            SELECT id, username, password_hash, display_name, mobile, email, organization_id, status,
+            SELECT id, username, password_hash, display_name, avatar_url, mobile, email, organization_id, status,
                    last_login_time, create_time, update_time
             FROM ef_user
             WHERE email = #{email}

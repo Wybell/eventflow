@@ -3,6 +3,10 @@ spring:
     name: eventflow
   main:
     banner-mode: "off"
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
 
 eventflow:
   security:
@@ -11,6 +15,8 @@ eventflow:
       secret: ${EVENTFLOW_JWT_SECRET:}
       access-token-ttl: PT30M
       refresh-token-ttl: P7D
+  storage:
+    avatar-directory: ${EVENTFLOW_AVATAR_DIRECTORY:uploads/avatars}
 
 management:
   endpoints:

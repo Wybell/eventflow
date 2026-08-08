@@ -7,6 +7,9 @@ const USER: CurrentUser = {
   id: 2,
   username: 'wybell',
   displayName: 'Wybell',
+  avatarUrl: null,
+  mobile: null,
+  email: null,
   organizationId: null,
   roles: ['USER'],
 };

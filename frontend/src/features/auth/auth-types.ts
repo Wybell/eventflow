@@ -14,6 +14,9 @@ export interface CurrentUser {
   id: number;
   username: string;
   displayName: string;
+  avatarUrl: string | null;
+  mobile: string | null;
+  email: string | null;
   organizationId: number | null;
   roles: string[];
 }
@@ -28,4 +31,15 @@ export interface RegisterInput {
 
 export interface RegistrationResponse {
   userId: number;
+}
+
+export interface UpdateProfileInput {
+  displayName: string;
+  mobile?: string;
+  email?: string;
+}
+
+export interface ChangePasswordInput {
+  currentPassword: string;
+  newPassword: string;
 }

@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Empty, Input, Modal, Table, Tabs, Tag, Typography, message } from 'antd';
-import { CalendarDays, Check, Compass, LogOut, RadioTower, X } from 'lucide-react';
+import { CalendarDays, Check, Compass, RadioTower, X } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ApiError } from '../../shared/api/api-contract';
 import { useSessionStore } from '../../shared/auth/session-store';
 import type { Activity } from '../activity/activity-types';
+import { ProfileMenu } from '../profile/ProfileMenu';
 import {
   getPendingActivityReviews,
   getReviewedActivities,
@@ -25,7 +26,6 @@ const STATUS_PRESENTATION: Record<Activity['status'], { color: string; label: st
 export function ActivityReviewPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const clearSession = useSessionStore((state) => state.clearSession);
   const currentUser = useSessionStore((state) => state.currentUser);
   const [messageApi, contextHolder] = message.useMessage();
   const [reviewTarget, setReviewTarget] = useState<{
@@ -79,16 +79,7 @@ export function ActivityReviewPage() {
           >
             我的活动
           </Button>
-          <Button
-            icon={<LogOut size={17} />}
-            onClick={() => {
-              clearSession();
-              navigate('/login', { replace: true });
-            }}
-            type="text"
-          >
-            退出
-          </Button>
+          <ProfileMenu />
         </div>
       </header>
       <main>

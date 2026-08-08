@@ -21,7 +21,6 @@ import {
   CalendarPlus,
   ChevronRight,
   CircleGauge,
-  LogOut,
   Plus,
   RadioTower,
   Rocket,
@@ -32,6 +31,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ApiError } from '../../shared/api/api-contract';
 import { useSessionStore } from '../../shared/auth/session-store';
+import { ProfileMenu } from '../profile/ProfileMenu';
 import {
   createActivity,
   createActivitySession,
@@ -55,7 +55,6 @@ type SessionFormValues = Omit<ActivitySessionInput, 'startTime' | 'endTime'> & {
 export function ActivityWorkspace() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const clearSession = useSessionStore((state) => state.clearSession);
   const currentUser = useSessionStore((state) => state.currentUser);
   const activityQueryKey = ['activities', 'mine', currentUser?.id] as const;
   const [messageApi, contextHolder] = message.useMessage();
@@ -178,11 +177,6 @@ export function ActivityWorkspace() {
     publishMutation.mutate(activity.id);
   };
 
-  const handleLogout = () => {
-    clearSession();
-    navigate('/login', { replace: true });
-  };
-
   return (
     <section className="activity-workspace" aria-label="我的活动">
       {contextHolder}
@@ -219,14 +213,7 @@ export function ActivityWorkspace() {
               发布活动
             </Button>
           </Tooltip>
-          <Tooltip title="退出登录">
-            <Button
-              aria-label="退出登录"
-              icon={<LogOut size={18} />}
-              onClick={handleLogout}
-              type="text"
-            />
-          </Tooltip>
+          <ProfileMenu />
         </div>
       </header>
 

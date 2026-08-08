@@ -8,6 +8,7 @@ interface SessionState {
   currentUser: CurrentUser | null;
   setAccessToken: (accessToken: string) => void;
   setSession: (accessToken: string, currentUser: CurrentUser) => void;
+  updateCurrentUser: (currentUser: CurrentUser) => void;
   clearSession: () => void;
 }
 
@@ -21,6 +22,7 @@ export const useSessionStore = create<SessionState>()(
         queryClient.clear();
         set({ accessToken, currentUser });
       },
+      updateCurrentUser: (currentUser) => set({ currentUser }),
       clearSession: () => {
         queryClient.clear();
         set({ accessToken: null, currentUser: null });

@@ -1,16 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { Button, Drawer, Empty, List, Progress, Spin, Tag, Typography } from 'antd';
-import { CalendarDays, LogOut, MapPin, RadioTower, ShieldCheck, TicketCheck } from 'lucide-react';
+import { CalendarDays, MapPin, RadioTower, ShieldCheck, TicketCheck } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getPublishedActivities, getPublishedActivitySessions } from '../activity/activity-api';
 import type { Activity } from '../activity/activity-types';
+import { ProfileMenu } from '../profile/ProfileMenu';
 import { useSessionStore } from '../../shared/auth/session-store';
 import './event-explore.css';
 
 export function EventExplorePage() {
   const navigate = useNavigate();
-  const clearSession = useSessionStore((state) => state.clearSession);
   const currentUser = useSessionStore((state) => state.currentUser);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const activitiesQuery = useQuery({
@@ -23,11 +23,6 @@ export function EventExplorePage() {
     enabled: selectedActivity !== null,
   });
 
-  const handleLogout = () => {
-    clearSession();
-    navigate('/login', { replace: true });
-  };
-
   return (
     <section className="event-explore" aria-label="活动发现">
       <header className="event-explore__header">
@@ -36,7 +31,7 @@ export function EventExplorePage() {
           <strong>EventFlow</strong>
         </div>
         <div className="event-explore__account">
-          <span>{currentUser?.displayName ?? '活动参与者'}</span>
+          <ProfileMenu />
           {currentUser?.roles.includes('ADMIN') ? (
             <Button
               icon={<ShieldCheck size={17} />}
@@ -49,7 +44,6 @@ export function EventExplorePage() {
           <Button onClick={() => navigate('/my-activities')} type="text">
             发布活动
           </Button>
-          <Button icon={<LogOut size={17} />} onClick={handleLogout} type="text" />
         </div>
       </header>
       <main className="event-explore__main">

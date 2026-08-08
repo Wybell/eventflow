@@ -29,4 +29,13 @@ public interface RefreshTokenMapper extends BaseMapper<RefreshToken> {
               AND revoked_time IS NULL
             """)
     int revokeById(@Param("id") Long id, @Param("revokedTime") LocalDateTime revokedTime);
+
+    @Update(
+            """
+            UPDATE ef_refresh_token
+            SET revoked_time = #{revokedTime}
+            WHERE user_id = #{userId}
+              AND revoked_time IS NULL
+            """)
+    int revokeAllByUserId(@Param("userId") Long userId, @Param("revokedTime") LocalDateTime revokedTime);
 }

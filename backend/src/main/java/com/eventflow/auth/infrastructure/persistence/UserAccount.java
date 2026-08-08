@@ -15,6 +15,7 @@ public class UserAccount {
     private String username;
     private String passwordHash;
     private String displayName;
+    private String avatarUrl;
     private String mobile;
     private String email;
     private Long organizationId;
@@ -57,6 +58,14 @@ public class UserAccount {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
     public String getMobile() {

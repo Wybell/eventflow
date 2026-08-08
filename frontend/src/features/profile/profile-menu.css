@@ -1,0 +1,87 @@
+.profile-trigger {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #eafcff;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  gap: 8px;
+  min-height: 40px;
+  padding: 3px 4px;
+}
+
+.profile-trigger:hover {
+  color: #72ecf7;
+}
+
+.profile-avatar {
+  background: #e8edf0;
+  border: 1px solid rgba(255, 255, 255, 0.46);
+  color: #7b8790;
+  flex: 0 0 auto;
+}
+
+.profile-avatar img {
+  object-fit: cover;
+}
+
+.profile-drawer .ant-drawer-header {
+  background: #f2fcff;
+  border-bottom-color: #d9eef3;
+}
+
+.profile-summary {
+  align-items: center;
+  border-bottom: 1px solid #dcecef;
+  display: flex;
+  gap: 20px;
+  margin-bottom: 8px;
+  padding: 4px 0 28px;
+}
+
+.profile-summary h2.ant-typography {
+  color: #082842;
+  font-size: 23px;
+  margin: 0 0 2px;
+}
+
+.profile-summary .ant-typography {
+  color: #657b89;
+}
+
+.profile-avatar-wrap {
+  flex: 0 0 88px;
+  height: 88px;
+  position: relative;
+}
+
+.profile-avatar-edit {
+  bottom: -2px;
+  box-shadow: 0 4px 14px rgba(8, 40, 66, 0.2);
+  position: absolute;
+  right: -4px;
+}
+
+.profile-roles {
+  margin-top: 10px;
+}
+
+.profile-drawer .ant-tabs {
+  margin-top: 12px;
+}
+
+.profile-drawer .ant-form {
+  max-width: 480px;
+  padding-top: 10px;
+}
+
+@media (max-width: 640px) {
+  .profile-trigger > span:not(.ant-avatar) {
+    display: none;
+  }
+
+  .profile-summary {
+    align-items: flex-start;
+  }
+}

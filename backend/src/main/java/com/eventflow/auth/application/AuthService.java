@@ -88,6 +88,9 @@ public class AuthService {
                 user.getId(),
                 user.getUsername(),
                 user.getDisplayName(),
+                user.getAvatarUrl(),
+                user.getMobile(),
+                user.getEmail(),
                 user.getOrganizationId(),
                 Set.copyOf(userRoleMapper.findRoleCodesByUserId(user.getId())));
     }
