@@ -10,6 +10,7 @@ import com.eventflow.activity.infrastructure.persistence.ActivitySessionMapper;
 import com.eventflow.registration.domain.RegistrationStatus;
 import com.eventflow.registration.infrastructure.persistence.ActivityRegistration;
 import com.eventflow.registration.infrastructure.persistence.ActivityRegistrationMapper;
+import com.eventflow.registration.infrastructure.persistence.OrganizerRegistrationRow;
 import com.eventflow.shared.error.BusinessException;
 import com.eventflow.shared.error.ErrorCode;
 import com.eventflow.shared.security.AuthenticatedPrincipal;
@@ -112,6 +113,44 @@ public class RegistrationService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public OrganizerRegistrationPage listForOrganizer(
+            AuthenticatedPrincipal principal,
+            Long activityId,
+            Long sessionId,
+            String status,
+            String keyword,
+            int page,
+            int size) {
+        Activity activity = activityMapper.selectById(activityId);
+        if (activity == null) {
+            throw new BusinessException(ErrorCode.RESOURCE_NOT_FOUND);
+        }
+        if (!activity.getCreateUserId().equals(principal.userId())
+                && !principal.roles().contains("ADMIN")) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
+
+        RegistrationStatus registrationStatus = parseStatus(status);
+        String normalizedKeyword = keyword == null || keyword.isBlank() ? null : keyword.trim();
+        long total = registrationMapper.countForOrganizer(activityId, sessionId, registrationStatus, normalizedKeyword);
+        long offset = (long) (page - 1) * size;
+        List<OrganizerRegistrationView> items = total <= offset
+                ? List.of()
+                : registrationMapper
+                        .findForOrganizer(activityId, sessionId, registrationStatus, normalizedKeyword, offset, size)
+                        .stream()
+                        .map(this::toOrganizerView)
+                        .toList();
+        return new OrganizerRegistrationPage(
+                total,
+                registrationMapper.countByActivityAndStatus(activityId, RegistrationStatus.CONFIRMED),
+                registrationMapper.countByActivityAndStatus(activityId, RegistrationStatus.CANCELLED),
+                page,
+                size,
+                items);
+    }
+
     @Transactional
     public void cancel(AuthenticatedPrincipal principal, Long registrationId) {
         ActivityRegistration registration = registrationMapper.selectById(registrationId);
@@ -170,6 +209,50 @@ public class RegistrationService {
                 .eq(ActivityRegistration::getUserId, userId));
     }
 
+    private RegistrationStatus parseStatus(String status) {
+        if (status == null || status.isBlank() || "ALL".equalsIgnoreCase(status)) {
+            return null;
+        }
+        try {
+            return RegistrationStatus.valueOf(status.trim().toUpperCase());
+        } catch (IllegalArgumentException exception) {
+            throw new BusinessException(ErrorCode.INVALID_ARGUMENT, "Invalid registration status");
+        }
+    }
+
+    private OrganizerRegistrationView toOrganizerView(OrganizerRegistrationRow row) {
+        return new OrganizerRegistrationView(
+                row.getId(),
+                row.getActivityId(),
+                row.getSessionId(),
+                row.getStatus(),
+                row.getDisplayName(),
+                row.getUsername(),
+                maskMobile(row.getMobile()),
+                maskEmail(row.getEmail()),
+                row.getSessionTitle(),
+                row.getRegistrationTime(),
+                row.getUpdateTime());
+    }
+
+    private String maskMobile(String mobile) {
+        if (mobile == null || mobile.length() < 7) {
+            return mobile;
+        }
+        return mobile.substring(0, 3) + "****" + mobile.substring(mobile.length() - 4);
+    }
+
+    private String maskEmail(String email) {
+        if (email == null || email.isBlank()) {
+            return email;
+        }
+        int at = email.indexOf('@');
+        if (at <= 1) {
+            return "***" + email.substring(Math.max(at, 0));
+        }
+        return email.charAt(0) + "***" + email.substring(at);
+    }
+
     private RegistrationView toView(
             ActivityRegistration registration, Map<Long, Activity> activities, Map<Long, ActivitySession> sessions) {
         Activity activity = activities.get(registration.getActivityId());
@@ -204,5 +287,26 @@ public class RegistrationService {
             LocalDateTime sessionStartTime,
             LocalDateTime sessionEndTime,
             LocalDateTime createTime,
+            LocalDateTime updateTime) {}
+
+    public record OrganizerRegistrationPage(
+            long total,
+            long confirmedCount,
+            long cancelledCount,
+            int page,
+            int size,
+            List<OrganizerRegistrationView> items) {}
+
+    public record OrganizerRegistrationView(
+            Long id,
+            Long activityId,
+            Long sessionId,
+            String status,
+            String displayName,
+            String username,
+            String mobile,
+            String email,
+            String sessionTitle,
+            LocalDateTime registrationTime,
             LocalDateTime updateTime) {}
 }

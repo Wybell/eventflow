@@ -1,0 +1,93 @@
+.activity-registrations-drawer__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.activity-registrations-drawer__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e7edf2;
+}
+
+.activity-registrations-drawer__filters {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.activity-registrations-drawer__search {
+  flex: 1;
+  min-width: 220px;
+}
+
+.activity-registrations-drawer__search button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  border: 1px solid #d9e2e8;
+  border-left: 0;
+  background: #f7fafb;
+  color: #19415d;
+  cursor: pointer;
+}
+
+.activity-registrations-drawer__loading {
+  display: grid;
+  min-height: 180px;
+  place-items: center;
+}
+
+.activity-registrations-drawer__list {
+  min-height: 120px;
+}
+
+.activity-registrations-drawer__participant {
+  display: grid;
+  grid-template-columns: minmax(130px, 1fr) minmax(230px, 2fr) auto;
+  gap: 16px;
+  align-items: center;
+  width: 100%;
+}
+
+.activity-registrations-drawer__participant-main,
+.activity-registrations-drawer__participant-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.activity-registrations-drawer__participant-main span,
+.activity-registrations-drawer__participant-meta {
+  color: #6c7c86;
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .activity-registrations-drawer__stats {
+    gap: 8px;
+  }
+
+  .activity-registrations-drawer__filters {
+    flex-wrap: wrap;
+  }
+
+  .activity-registrations-drawer__search {
+    flex-basis: 100%;
+  }
+
+  .activity-registrations-drawer__participant {
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+  }
+
+  .activity-registrations-drawer__participant-meta {
+    grid-column: 1 / -1;
+  }
+}

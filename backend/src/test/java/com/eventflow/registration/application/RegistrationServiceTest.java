@@ -3,6 +3,8 @@ package com.eventflow.registration.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,6 +18,7 @@ import com.eventflow.activity.infrastructure.persistence.ActivitySessionMapper;
 import com.eventflow.registration.domain.RegistrationStatus;
 import com.eventflow.registration.infrastructure.persistence.ActivityRegistration;
 import com.eventflow.registration.infrastructure.persistence.ActivityRegistrationMapper;
+import com.eventflow.registration.infrastructure.persistence.OrganizerRegistrationRow;
 import com.eventflow.shared.error.BusinessException;
 import com.eventflow.shared.error.ErrorCode;
 import com.eventflow.shared.security.AuthenticatedPrincipal;
@@ -24,6 +27,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -161,6 +165,52 @@ class RegistrationServiceTest {
                 .isEqualTo(ErrorCode.FORBIDDEN);
 
         verify(activitySessionMapper, never()).releaseConfirmedQuota(any(), any());
+    }
+
+    @Test
+    void shouldListOrganizerRegistrationsWithMaskedContactDetails() {
+        Activity activity = activity(ActivityStatus.PUBLISHED, NOW.minusHours(1), NOW.plusHours(1));
+        activity.setCreateUserId(7L);
+        when(activityMapper.selectById(11L)).thenReturn(activity);
+        OrganizerRegistrationRow row = new OrganizerRegistrationRow();
+        row.setId(31L);
+        row.setActivityId(11L);
+        row.setSessionId(21L);
+        row.setStatus("CONFIRMED");
+        row.setDisplayName("张三");
+        row.setUsername("zhangsan");
+        row.setMobile("13812341234");
+        row.setEmail("zhangsan@example.com");
+        row.setSessionTitle("晚场");
+        when(registrationMapper.countForOrganizer(11L, null, RegistrationStatus.CONFIRMED, null))
+                .thenReturn(1L);
+        when(registrationMapper.countByActivityAndStatus(11L, RegistrationStatus.CONFIRMED))
+                .thenReturn(1L);
+        when(registrationMapper.countByActivityAndStatus(11L, RegistrationStatus.CANCELLED))
+                .thenReturn(0L);
+        when(registrationMapper.findForOrganizer(11L, null, RegistrationStatus.CONFIRMED, null, 0L, 20))
+                .thenReturn(List.of(row));
+
+        RegistrationService.OrganizerRegistrationPage result =
+                service().listForOrganizer(user(7L), 11L, null, "CONFIRMED", null, 1, 20);
+
+        assertThat(result.total()).isEqualTo(1);
+        assertThat(result.items().get(0).mobile()).isEqualTo("138****1234");
+        assertThat(result.items().get(0).email()).isEqualTo("z***@example.com");
+    }
+
+    @Test
+    void shouldRejectOrganizerRegistrationListForAnotherUser() {
+        Activity activity = activity(ActivityStatus.PUBLISHED, NOW.minusHours(1), NOW.plusHours(1));
+        activity.setCreateUserId(9L);
+        when(activityMapper.selectById(11L)).thenReturn(activity);
+
+        assertThatThrownBy(() -> service().listForOrganizer(user(7L), 11L, null, null, null, 1, 20))
+                .isInstanceOf(BusinessException.class)
+                .extracting(exception -> ((BusinessException) exception).errorCode())
+                .isEqualTo(ErrorCode.FORBIDDEN);
+
+        verify(registrationMapper, never()).findForOrganizer(any(), any(), any(), any(), anyLong(), anyInt());
     }
 
     private void givenOpenActivityAndSession() {

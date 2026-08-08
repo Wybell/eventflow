@@ -26,12 +26,14 @@ import {
   Rocket,
   Send,
   ShieldCheck,
+  Users,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ApiError } from '../../shared/api/api-contract';
 import { useSessionStore } from '../../shared/auth/session-store';
 import { ProfileMenu } from '../profile/ProfileMenu';
+import { ActivityRegistrationsDrawer } from '../registration/ActivityRegistrationsDrawer';
 import {
   createActivity,
   createActivitySession,
@@ -59,6 +61,7 @@ export function ActivityWorkspace() {
   const activityQueryKey = ['activities', 'mine', currentUser?.id] as const;
   const [messageApi, contextHolder] = message.useMessage();
   const [isActivityDrawerOpen, setActivityDrawerOpen] = useState(false);
+  const [isRegistrationsDrawerOpen, setRegistrationsDrawerOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [activityForm] = Form.useForm<ActivityFormValues>();
   const [sessionForm] = Form.useForm<SessionFormValues>();
@@ -263,6 +266,10 @@ export function ActivityWorkspace() {
                   }
                   key={activity.id}
                   onEdit={() => openEditDrawer(activity)}
+                  onManageRegistrations={() => {
+                    setSelectedActivity(activity);
+                    setRegistrationsDrawerOpen(true);
+                  }}
                   onPublish={() => handlePublish(activity)}
                   onSelect={() => setSelectedActivity(activity)}
                   onSubmit={() => handleSubmit(activity)}
@@ -359,7 +366,7 @@ export function ActivityWorkspace() {
         closeIcon={null}
         destroyOnClose
         onClose={() => setSelectedActivity(null)}
-        open={selectedActivity !== null && !isActivityDrawerOpen}
+        open={selectedActivity !== null && !isActivityDrawerOpen && !isRegistrationsDrawerOpen}
         title={selectedActivity?.title ?? '活动详情'}
         width={620}
       >
@@ -387,6 +394,14 @@ export function ActivityWorkspace() {
                 <span>名额控制</span>
                 <Typography.Title level={3}>场次与配额</Typography.Title>
               </div>
+              {selectedActivity.status === 'PUBLISHED' || selectedActivity.status === 'OFFLINE' ? (
+                <Button
+                  icon={<Users size={16} />}
+                  onClick={() => setRegistrationsDrawerOpen(true)}
+                >
+                  报名管理
+                </Button>
+              ) : null}
             </div>
             {canConfigureSessions(selectedActivity) ? (
               <Form<SessionFormValues>
@@ -459,6 +474,16 @@ export function ActivityWorkspace() {
           </section>
         ) : null}
       </Drawer>
+      <ActivityRegistrationsDrawer
+        activityId={selectedActivity?.id ?? null}
+        activityTitle={selectedActivity?.title ?? ''}
+        onClose={() => {
+          setRegistrationsDrawerOpen(false);
+          setSelectedActivity(null);
+        }}
+        open={isRegistrationsDrawerOpen}
+        sessions={sessionsQuery.data ?? []}
+      />
     </section>
   );
 }
@@ -482,6 +507,7 @@ function ActivityRow({
   isSubmitDisabled,
   isSubmitting,
   onEdit,
+  onManageRegistrations,
   onPublish,
   onSubmit,
   onSelect,
@@ -492,6 +518,7 @@ function ActivityRow({
   isSubmitDisabled: boolean;
   isSubmitting: boolean;
   onEdit: () => void;
+  onManageRegistrations: () => void;
   onPublish: () => void;
   onSubmit: () => void;
   onSelect: () => void;
@@ -513,6 +540,11 @@ function ActivityRow({
         <ChevronRight aria-hidden="true" size={18} />
       </button>
       <div className="activity-workspace__row-actions">
+        {activity.status === 'PUBLISHED' || activity.status === 'OFFLINE' ? (
+          <Button icon={<Users size={15} />} onClick={onManageRegistrations}>
+            报名管理
+          </Button>
+        ) : null}
         {canEdit ? <Button onClick={onEdit}>编辑</Button> : null}
         {canEdit ? (
           <Button

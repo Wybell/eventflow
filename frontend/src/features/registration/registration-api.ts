@@ -1,6 +1,11 @@
 import type { ApiResponse } from '../../shared/api/api-contract';
 import { httpClient } from '../../shared/api/http-client';
-import type { ActivityRegistration, RegistrationInput } from './registration-types';
+import type {
+  ActivityRegistration,
+  OrganizerRegistrationPage,
+  OrganizerRegistrationQuery,
+  RegistrationInput,
+} from './registration-types';
 
 interface IdResponse {
   id: number;
@@ -19,4 +24,15 @@ export async function getMyRegistrations(): Promise<ActivityRegistration[]> {
 
 export async function cancelRegistration(id: number): Promise<void> {
   await httpClient.post<ApiResponse<null>>(`/v1/registrations/${id}/cancel`);
+}
+
+export async function getOrganizerRegistrations(
+  activityId: number,
+  query: OrganizerRegistrationQuery,
+): Promise<OrganizerRegistrationPage> {
+  const response = await httpClient.get<ApiResponse<OrganizerRegistrationPage>>(
+    `/v1/activities/${activityId}/registrations`,
+    { params: query },
+  );
+  return response.data.data;
 }
