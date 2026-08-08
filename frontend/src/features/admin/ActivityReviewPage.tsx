@@ -1,36 +1,63 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Empty, Input, Modal, Table, Tag, Typography, message } from 'antd';
+import { Button, Empty, Input, Modal, Table, Tabs, Tag, Typography, message } from 'antd';
 import { CalendarDays, Check, Compass, LogOut, RadioTower, X } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import type { ApiError } from '../../shared/api/api-contract';
 import { useSessionStore } from '../../shared/auth/session-store';
 import type { Activity } from '../activity/activity-types';
-import { getPendingActivityReviews, reviewActivity } from './activity-review-api';
+import {
+  getPendingActivityReviews,
+  getReviewedActivities,
+  reviewActivity,
+} from './activity-review-api';
 import './organizer-applications.css';
+
+const STATUS_PRESENTATION: Record<Activity['status'], { color: string; label: string }> = {
+  DRAFT: { color: 'default', label: '草稿' },
+  PENDING_REVIEW: { color: 'gold', label: '待审核' },
+  APPROVED: { color: 'blue', label: '审核通过，待发布' },
+  REJECTED: { color: 'red', label: '已驳回' },
+  PUBLISHED: { color: 'green', label: '已发布' },
+  OFFLINE: { color: 'default', label: '已下架' },
+};
 
 export function ActivityReviewPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const clearSession = useSessionStore((state) => state.clearSession);
+  const currentUser = useSessionStore((state) => state.currentUser);
   const [messageApi, contextHolder] = message.useMessage();
   const [reviewTarget, setReviewTarget] = useState<{
     activity: Activity;
     action: 'approve' | 'reject';
   } | null>(null);
   const [reviewNote, setReviewNote] = useState('');
+  const pendingReviewQueryKey = ['activities', 'admin', 'pending-review', currentUser?.id] as const;
+  const reviewedActivitiesQueryKey = ['activities', 'admin', 'reviewed', currentUser?.id] as const;
   const activitiesQuery = useQuery({
-    queryKey: ['activities', 'pending-review'],
+    queryKey: pendingReviewQueryKey,
     queryFn: getPendingActivityReviews,
+    enabled: currentUser !== null,
+  });
+  const reviewedActivitiesQuery = useQuery({
+    queryKey: reviewedActivitiesQueryKey,
+    queryFn: getReviewedActivities,
+    enabled: currentUser !== null,
   });
   const reviewMutation = useMutation({
     mutationFn: () =>
       reviewActivity(reviewTarget?.activity.id ?? 0, reviewTarget?.action ?? 'reject', reviewNote),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['activities', 'pending-review'] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: pendingReviewQueryKey }),
+        queryClient.invalidateQueries({ queryKey: reviewedActivitiesQueryKey }),
+      ]);
       setReviewTarget(null);
       setReviewNote('');
       messageApi.success('审核结果已保存');
     },
+    onError: (error: ApiError) => messageApi.error(error.message),
   });
 
   return (
@@ -45,7 +72,11 @@ export function ActivityReviewPage() {
           <Button icon={<Compass size={17} />} onClick={() => navigate('/events')} type="text">
             活动广场
           </Button>
-          <Button icon={<CalendarDays size={17} />} onClick={() => navigate('/my-activities')} type="text">
+          <Button
+            icon={<CalendarDays size={17} />}
+            onClick={() => navigate('/my-activities')}
+            type="text"
+          >
             我的活动
           </Button>
           <Button
@@ -63,51 +94,35 @@ export function ActivityReviewPage() {
       <main>
         <Typography.Title level={1}>活动审核中心</Typography.Title>
         <Typography.Paragraph>审核通过后，活动发起者确认后手动发布。</Typography.Paragraph>
-        {activitiesQuery.data?.length === 0 ? (
-          <Empty description="暂无待审核活动" />
-        ) : (
-          <Table<Activity>
-            dataSource={activitiesQuery.data}
-            loading={activitiesQuery.isLoading}
-            pagination={false}
-            rowKey="id"
-            columns={[
-              { title: '活动名称', dataIndex: 'title' },
-              { title: '主办名称', dataIndex: 'organizerName' },
-              { title: '联系人', dataIndex: 'contactName' },
-              {
-                title: '报名时间',
-                render: (_, activity) =>
-                  formatDateRange(activity.registrationStartTime, activity.registrationEndTime),
-              },
-              {
-                title: '状态',
-                render: () => <Tag color="gold">待审核</Tag>,
-              },
-              {
-                title: '操作',
-                render: (_, activity) => (
-                  <>
-                    <Button
-                      icon={<Check size={15} />}
-                      onClick={() => setReviewTarget({ activity, action: 'approve' })}
-                      type="primary"
-                    >
-                      通过审核
-                    </Button>
-                    <Button
-                      danger
-                      icon={<X size={15} />}
-                      onClick={() => setReviewTarget({ activity, action: 'reject' })}
-                    >
-                      驳回
-                    </Button>
-                  </>
-                ),
-              },
-            ]}
-          />
-        )}
+        <Tabs
+          className="admin-applications__tabs"
+          items={[
+            {
+              key: 'pending',
+              label: `待审核 (${activitiesQuery.data?.length ?? 0})`,
+              children: (
+                <ActivityReviewTable
+                  activities={activitiesQuery.data ?? []}
+                  emptyText="暂无待审核活动"
+                  loading={activitiesQuery.isLoading}
+                  onApprove={(activity) => setReviewTarget({ activity, action: 'approve' })}
+                  onReject={(activity) => setReviewTarget({ activity, action: 'reject' })}
+                />
+              ),
+            },
+            {
+              key: 'reviewed',
+              label: `我的审核记录 (${reviewedActivitiesQuery.data?.length ?? 0})`,
+              children: (
+                <ActivityReviewTable
+                  activities={reviewedActivitiesQuery.data ?? []}
+                  emptyText="暂无审核记录"
+                  loading={reviewedActivitiesQuery.isLoading}
+                />
+              ),
+            },
+          ]}
+        />
       </main>
       <Modal
         cancelText="取消"
@@ -136,6 +151,73 @@ export function ActivityReviewPage() {
       </Modal>
     </section>
   );
+}
+
+function ActivityReviewTable({
+  activities,
+  emptyText,
+  loading,
+  onApprove,
+  onReject,
+}: {
+  activities: Activity[];
+  emptyText: string;
+  loading: boolean;
+  onApprove?: (activity: Activity) => void;
+  onReject?: (activity: Activity) => void;
+}) {
+  if (!loading && activities.length === 0) {
+    return <Empty description={emptyText} />;
+  }
+
+  return (
+    <Table<Activity>
+      columns={[
+        { title: '活动名称', dataIndex: 'title' },
+        { title: '主办名称', dataIndex: 'organizerName' },
+        { title: '联系人', dataIndex: 'contactName' },
+        {
+          title: '报名时间',
+          render: (_, activity) =>
+            formatDateRange(activity.registrationStartTime, activity.registrationEndTime),
+        },
+        {
+          title: '当前状态',
+          render: (_, activity) => <ActivityStatusTag status={activity.status} />,
+        },
+        ...(onApprove && onReject
+          ? [
+              {
+                title: '操作',
+                render: (_: unknown, activity: Activity) => (
+                  <>
+                    <Button
+                      icon={<Check size={15} />}
+                      onClick={() => onApprove(activity)}
+                      type="primary"
+                    >
+                      通过审核
+                    </Button>
+                    <Button danger icon={<X size={15} />} onClick={() => onReject(activity)}>
+                      驳回
+                    </Button>
+                  </>
+                ),
+              },
+            ]
+          : []),
+      ]}
+      dataSource={activities}
+      loading={loading}
+      pagination={false}
+      rowKey="id"
+    />
+  );
+}
+
+function ActivityStatusTag({ status }: { status: Activity['status'] }) {
+  const presentation = STATUS_PRESENTATION[status];
+  return <Tag color={presentation.color}>{presentation.label}</Tag>;
 }
 
 function formatDateRange(start: string, end: string): string {

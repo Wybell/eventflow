@@ -52,20 +52,23 @@ type SessionFormValues = Omit<ActivitySessionInput, 'startTime' | 'endTime'> & {
   sessionWindow: [Dayjs, Dayjs];
 };
 
-const ACTIVITY_QUERY_KEY = ['activities', 'mine'] as const;
-
 export function ActivityWorkspace() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const clearSession = useSessionStore((state) => state.clearSession);
   const currentUser = useSessionStore((state) => state.currentUser);
+  const activityQueryKey = ['activities', 'mine', currentUser?.id] as const;
   const [messageApi, contextHolder] = message.useMessage();
   const [isActivityDrawerOpen, setActivityDrawerOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [activityForm] = Form.useForm<ActivityFormValues>();
   const [sessionForm] = Form.useForm<SessionFormValues>();
 
-  const activitiesQuery = useQuery({ queryKey: ACTIVITY_QUERY_KEY, queryFn: getMyActivities });
+  const activitiesQuery = useQuery({
+    queryKey: activityQueryKey,
+    queryFn: getMyActivities,
+    enabled: currentUser !== null,
+  });
   const sessionsQuery = useQuery({
     queryKey: ['activity-sessions', selectedActivity?.id],
     queryFn: () => getActivitySessions(selectedActivity?.id ?? 0),
@@ -82,7 +85,7 @@ export function ActivityWorkspace() {
       }
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ACTIVITY_QUERY_KEY });
+      await queryClient.invalidateQueries({ queryKey: activityQueryKey });
       messageApi.success(selectedActivity === null ? '活动草稿已创建' : '活动信息已保存');
       setActivityDrawerOpen(false);
     },
@@ -110,7 +113,7 @@ export function ActivityWorkspace() {
   const submitMutation = useMutation({
     mutationFn: submitActivityForReview,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ACTIVITY_QUERY_KEY });
+      await queryClient.invalidateQueries({ queryKey: activityQueryKey });
       setSelectedActivity(null);
       messageApi.success('活动已提交审核，审核通过后等待你确认发布');
     },
@@ -120,7 +123,7 @@ export function ActivityWorkspace() {
   const publishMutation = useMutation({
     mutationFn: publishActivity,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ACTIVITY_QUERY_KEY });
+      await queryClient.invalidateQueries({ queryKey: activityQueryKey });
       setSelectedActivity(null);
       messageApi.success('活动已正式发布到活动广场');
     },

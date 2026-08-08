@@ -20,6 +20,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -96,6 +97,23 @@ class ActivityServiceTest {
     }
 
     @Test
+    void shouldListDistinctActivitiesReviewedByCurrentAdministrator() {
+        ActivityReviewRecord latestReview = reviewRecord(3L, 23L, 1L);
+        ActivityReviewRecord earlierReview = reviewRecord(2L, 18L, 1L);
+        ActivityReviewRecord repeatedReview = reviewRecord(1L, 23L, 1L);
+        when(activityReviewRecordMapper.selectList(any()))
+                .thenReturn(List.of(latestReview, earlierReview, repeatedReview));
+        when(activityMapper.selectBatchIds(List.of(23L, 18L)))
+                .thenReturn(List.of(
+                        activity(18L, 7L, ActivityStatus.REJECTED), activity(23L, 9L, ActivityStatus.PUBLISHED)));
+        ActivityService service = service();
+
+        List<Activity> reviewedActivities = service.listReviewed(admin(1L));
+
+        assertThat(reviewedActivities).extracting(Activity::getId).containsExactly(23L, 18L);
+    }
+
+    @Test
     void shouldAllowCreatorToPublishApprovedActivity() {
         Activity activity = activity(18L, 7L, ActivityStatus.APPROVED);
         when(activityMapper.selectById(18L)).thenReturn(activity);
@@ -149,6 +167,14 @@ class ActivityServiceTest {
         activity.setCreateUserId(creatorUserId);
         activity.setStatus(status);
         return activity;
+    }
+
+    private ActivityReviewRecord reviewRecord(Long id, Long activityId, Long reviewerUserId) {
+        ActivityReviewRecord record = new ActivityReviewRecord();
+        record.setId(id);
+        record.setActivityId(activityId);
+        record.setReviewerUserId(reviewerUserId);
+        return record;
     }
 
     private AuthenticatedPrincipal user(Long userId) {

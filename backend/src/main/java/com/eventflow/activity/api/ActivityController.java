@@ -73,8 +73,7 @@ public class ActivityController {
     }
 
     @PostMapping("/{id}/publish")
-    public ApiResponse<Void> publish(
-            @AuthenticationPrincipal AuthenticatedPrincipal principal, @PathVariable Long id) {
+    public ApiResponse<Void> publish(@AuthenticationPrincipal AuthenticatedPrincipal principal, @PathVariable Long id) {
         activityService.publish(principal, id);
         return ApiResponse.success(null);
     }

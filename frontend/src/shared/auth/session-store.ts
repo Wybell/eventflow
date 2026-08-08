@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { CurrentUser } from '../../features/auth/auth-types';
+import { queryClient } from '../lib/query-client';
 
 interface SessionState {
   accessToken: string | null;
@@ -16,8 +17,14 @@ export const useSessionStore = create<SessionState>()(
       accessToken: null,
       currentUser: null,
       setAccessToken: (accessToken) => set({ accessToken }),
-      setSession: (accessToken, currentUser) => set({ accessToken, currentUser }),
-      clearSession: () => set({ accessToken: null, currentUser: null }),
+      setSession: (accessToken, currentUser) => {
+        queryClient.clear();
+        set({ accessToken, currentUser });
+      },
+      clearSession: () => {
+        queryClient.clear();
+        set({ accessToken: null, currentUser: null });
+      },
     }),
     {
       name: 'eventflow-session-v1',

@@ -9,6 +9,11 @@ export async function getPendingActivityReviews(): Promise<Activity[]> {
   return response.data.data;
 }
 
+export async function getReviewedActivities(): Promise<Activity[]> {
+  const response = await httpClient.get<ApiResponse<Activity[]>>('/v1/admin/activities/reviewed');
+  return response.data.data;
+}
+
 export async function reviewActivity(
   id: number,
   action: 'approve' | 'reject',

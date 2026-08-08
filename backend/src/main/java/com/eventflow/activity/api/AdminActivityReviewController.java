@@ -32,6 +32,14 @@ public class AdminActivityReviewController {
                 .toList());
     }
 
+    @GetMapping("/reviewed")
+    public ApiResponse<List<ActivityController.ActivityResponse>> listReviewed(
+            @AuthenticationPrincipal AuthenticatedPrincipal principal) {
+        return ApiResponse.success(activityService.listReviewed(principal).stream()
+                .map(ActivityController.ActivityResponse::from)
+                .toList());
+    }
+
     @PostMapping("/{id}/approve")
     public ApiResponse<Void> approve(
             @AuthenticationPrincipal AuthenticatedPrincipal principal,

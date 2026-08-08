@@ -14,6 +14,10 @@ import com.eventflow.shared.security.AuthenticatedPrincipal;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,6 +86,29 @@ public class ActivityService {
         return activityMapper.selectList(new LambdaQueryWrapper<Activity>()
                 .eq(Activity::getStatus, ActivityStatus.PENDING_REVIEW)
                 .orderByAsc(Activity::getId));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Activity> listReviewed(AuthenticatedPrincipal principal) {
+        requireAdmin(principal);
+        List<Long> activityIds = activityReviewRecordMapper
+                .selectList(new LambdaQueryWrapper<ActivityReviewRecord>()
+                        .eq(ActivityReviewRecord::getReviewerUserId, principal.userId())
+                        .orderByDesc(ActivityReviewRecord::getId))
+                .stream()
+                .map(ActivityReviewRecord::getActivityId)
+                .distinct()
+                .toList();
+        if (activityIds.isEmpty()) {
+            return List.of();
+        }
+
+        Map<Long, Activity> activitiesById = activityMapper.selectBatchIds(activityIds).stream()
+                .collect(Collectors.toMap(Activity::getId, Function.identity()));
+        return activityIds.stream()
+                .map(activitiesById::get)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     @Transactional(readOnly = true)
