@@ -119,7 +119,9 @@ export function EventExplorePage() {
         <section className="event-explore__intro">
           <div>
             <Typography.Title level={1}>探索值得到场的活动</Typography.Title>
-            <Typography.Paragraph>发现公开活动，查看场次和实时可用名额。</Typography.Paragraph>
+            <Typography.Paragraph className="event-explore__intro-copy">
+              发现公开活动，查看场次和实时可用名额。
+            </Typography.Paragraph>
           </div>
           <Tag className="event-explore__identity">活动广场</Tag>
         </section>
