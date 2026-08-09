@@ -24,6 +24,18 @@
 .activity-registrations-drawer .ant-drawer-body {
   background: rgba(5, 10, 30, 0.26) !important;
   backdrop-filter: blur(2px);
+  padding: 0 !important;
+}
+
+.activity-registrations-drawer__surface {
+  min-height: 100%;
+  box-sizing: border-box;
+  padding: 24px;
+  background-image: linear-gradient(rgba(5, 10, 30, 0.3), rgba(7, 14, 38, 0.5)),
+    url('/images/registration-background.png');
+  background-position: center;
+  background-size: cover;
+  color: #eef4ff;
 }
 
 .activity-registrations-drawer .ant-statistic-title,

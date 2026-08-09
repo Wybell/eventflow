@@ -48,6 +48,18 @@
 .profile-drawer .ant-drawer-body {
   background: rgba(5, 10, 30, 0.16) !important;
   backdrop-filter: blur(1px);
+  padding: 0 !important;
+  color: #eef4ff;
+}
+
+.profile-drawer__surface {
+  min-height: 100%;
+  box-sizing: border-box;
+  padding: 24px;
+  background-image: linear-gradient(rgba(7, 11, 28, 0.42), rgba(11, 17, 43, 0.58)),
+    url('/images/profile-background.jpg');
+  background-position: center;
+  background-size: cover;
   color: #eef4ff;
 }
 

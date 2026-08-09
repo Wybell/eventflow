@@ -72,6 +72,7 @@ export function ActivityRegistrationsDrawer({
       }
       width={760}
     >
+      <div className="activity-registrations-drawer__surface">
       <div className="activity-registrations-drawer__stats">
         <Statistic title="已报名" value={data?.confirmedCount ?? 0} />
         <Statistic title="已取消" value={data?.cancelledCount ?? 0} />
@@ -158,6 +159,7 @@ export function ActivityRegistrationsDrawer({
           total={data.total}
         />
       ) : null}
+      </div>
     </Drawer>
   );
 }

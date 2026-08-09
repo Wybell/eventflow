@@ -156,6 +156,7 @@ export function ProfileMenu() {
         title="个人中心"
         width={620}
       >
+        <div className="profile-drawer__surface">
         <section className="profile-summary">
           <div className="profile-avatar-wrap">
             <UserAvatar avatarUrl={currentUser.avatarUrl} size={88} />
@@ -271,6 +272,7 @@ export function ProfileMenu() {
             },
           ]}
         />
+        </div>
       </Drawer>
     </>
   );
