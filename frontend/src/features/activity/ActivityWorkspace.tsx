@@ -22,7 +22,6 @@ import {
   ChevronRight,
   CircleGauge,
   Plus,
-  RadioTower,
   Rocket,
   Send,
   ShieldCheck,
@@ -190,7 +189,7 @@ export function ActivityWorkspace() {
           onClick={() => navigate('/events')}
         >
           <span className="activity-workspace__brand-mark" aria-hidden="true">
-            <RadioTower size={24} />
+            <img src="/icons/eventflow-192.png" alt="" />
           </span>
           <span>
             <strong>EventFlow</strong>

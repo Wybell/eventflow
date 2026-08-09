@@ -5,7 +5,6 @@ import {
   CalendarClock,
   ClipboardList,
   MapPin,
-  RadioTower,
   ShieldCheck,
   TicketCheck,
   XCircle,
@@ -90,7 +89,7 @@ export function EventExplorePage() {
       {contextHolder}
       <header className="event-explore__header">
         <div className="event-explore__brand">
-          <RadioTower size={23} />
+          <img className="event-explore__brand-logo" src="/icons/eventflow-192.png" alt="" />
           <strong>EventFlow</strong>
         </div>
         <div className="event-explore__account">

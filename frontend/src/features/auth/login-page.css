@@ -5,7 +5,8 @@
 }
 
 .login-page__scene {
-  background-image: url('/login-portal-background.png');
+  background-image: linear-gradient(90deg, rgba(3, 7, 24, 0.5), rgba(3, 7, 24, 0.18)),
+    url('/images/login-background.jpg');
   background-position: center 10%;
   background-repeat: no-repeat;
   background-size: cover;
@@ -48,13 +49,20 @@
   width: 38px;
 }
 
+.login-page__brand-mark img {
+  border-radius: 6px;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
 .login-panel,
 .access-panel {
-  backdrop-filter: blur(18px);
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(207, 232, 240, 0.96);
-  border-radius: 8px;
-  box-shadow: 0 24px 72px rgba(3, 23, 49, 0.24);
+  backdrop-filter: blur(22px) saturate(120%);
+  background: linear-gradient(145deg, rgba(13, 26, 59, 0.52), rgba(8, 16, 40, 0.28));
+  border: 1px solid rgba(218, 235, 255, 0.22);
+  border-radius: 14px;
+  box-shadow: 0 24px 72px rgba(1, 4, 18, 0.3), inset 0 1px rgba(255, 255, 255, 0.1);
   max-width: 432px;
   padding: 38px;
   width: 100%;
@@ -66,7 +74,7 @@
 
 .login-panel__heading .ant-typography,
 .access-panel .ant-typography {
-  color: #0b2440;
+  color: #f7fbff;
   letter-spacing: 0;
 }
 
@@ -79,36 +87,74 @@
 
 .login-panel__heading p,
 .access-panel p {
-  color: #557187;
+  color: rgba(225, 237, 255, 0.72);
   font-size: 14px;
   line-height: 1.7;
   margin-bottom: 0;
 }
 
 .login-panel .ant-form-item-label > label {
-  color: #294962;
+  color: rgba(236, 246, 255, 0.88);
   font-size: 14px;
   font-weight: 600;
 }
 
 .login-panel .ant-input-affix-wrapper {
-  background: #f7fcfe;
-  border-color: #cfe6ec;
-  border-radius: 6px;
+  background: rgba(2, 8, 28, 0.24);
+  border-color: rgba(194, 221, 255, 0.3);
+  border-radius: 8px;
   min-height: 46px;
+}
+
+.login-panel .ant-input,
+.login-panel .ant-input-password-icon,
+.login-panel .ant-input-prefix {
+  color: #f7fbff !important;
+  -webkit-text-fill-color: #f7fbff;
+}
+
+.login-panel .ant-input-affix-wrapper .ant-input {
+  background: transparent !important;
+  color: #f7fbff !important;
+  -webkit-text-fill-color: #f7fbff;
+}
+
+.login-panel input:-webkit-autofill,
+.login-panel input:-webkit-autofill:hover,
+.login-panel input:-webkit-autofill:focus,
+.login-panel input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px rgba(2, 8, 28, 0.24) inset !important;
+  -webkit-text-fill-color: #f7fbff !important;
+  caret-color: #f7fbff;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+.login-panel .ant-input::placeholder {
+  color: rgba(231, 241, 255, 0.62) !important;
+  -webkit-text-fill-color: rgba(231, 241, 255, 0.62);
+}
+
+.login-panel input::selection {
+  background: rgba(102, 222, 243, 0.42);
+  color: #ffffff;
+}
+
+.login-panel .ant-input-password-icon {
+  color: rgba(226, 240, 255, 0.82) !important;
 }
 
 .login-panel .ant-input-affix-wrapper:focus,
 .login-panel .ant-input-affix-wrapper-focused {
-  border-color: #35bfe4;
-  box-shadow: 0 0 0 3px rgba(53, 191, 228, 0.16);
+  border-color: #8beaff;
+  box-shadow: 0 0 0 3px rgba(92, 220, 255, 0.16);
 }
 
 .login-panel__submit {
   align-items: center;
-  background: #0789b7;
-  border-color: #0789b7;
-  box-shadow: 0 10px 22px rgba(7, 137, 183, 0.28);
+  background: #66def3;
+  border-color: #66def3;
+  box-shadow: 0 10px 22px rgba(41, 196, 235, 0.26);
+  color: #06172e;
   display: inline-flex;
   justify-content: center;
   margin-top: 8px;
@@ -116,8 +162,9 @@
 
 .login-panel__submit:hover,
 .login-panel__submit:focus {
-  background: #04739d !important;
-  border-color: #04739d !important;
+  background: #9af0ff !important;
+  border-color: #9af0ff !important;
+  color: #06172e !important;
 }
 
 .login-panel__error {
@@ -150,12 +197,19 @@
   padding-block: 42px;
 }
 
+.register-page .login-page__scene {
+  background-image: linear-gradient(90deg, rgba(6, 4, 18, 0.52), rgba(6, 4, 18, 0.2)),
+    url('/images/register-background.jpg');
+  background-position: center center;
+}
+
 .register-panel {
   max-height: calc(100dvh - 84px);
   overflow-y: auto;
 }
 
 .register-panel__back {
+  color: #bcecff;
   margin: -6px 0 18px;
 }
 

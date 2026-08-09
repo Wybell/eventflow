@@ -1,11 +1,17 @@
 .admin-applications {
-  background: #f0fbfd;
+  background-image: linear-gradient(rgba(7, 8, 26, 0.74), rgba(10, 12, 37, 0.86)),
+    url('/images/reviews-background.jpg');
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
   min-height: 100dvh;
   color: #082842;
 }
 .admin-applications header {
   align-items: center;
-  background: #061b37;
+  background: rgba(5, 6, 21, 0.76);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(161, 187, 255, 0.2);
   color: #ebfdff;
   display: flex;
   justify-content: space-between;
@@ -16,6 +22,13 @@
   align-items: center;
   display: flex;
   gap: 10px;
+}
+
+.admin-applications__brand-logo {
+  border-radius: 7px;
+  height: 30px;
+  object-fit: cover;
+  width: 30px;
 }
 .admin-applications header .ant-btn {
   color: #d8faff;
@@ -30,16 +43,48 @@
   padding: 54px clamp(22px, 6vw, 88px);
 }
 .admin-applications h1.ant-typography {
-  color: #082842;
+  color: #f4f8ff;
   margin-bottom: 8px;
 }
 .admin-applications__tabs {
   margin-top: 26px;
 }
+
+.admin-applications .ant-tabs-tab,
+.admin-applications .ant-tabs-tab-btn {
+  color: rgba(221, 231, 255, 0.68);
+}
+
+.admin-applications .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #b9efff;
+}
 .admin-applications .ant-table-wrapper {
-  background: #fff;
-  box-shadow: 0 16px 35px rgba(10, 72, 94, 0.12);
+  background: rgba(17, 27, 59, 0.84);
+  box-shadow: 0 18px 42px rgba(1, 3, 17, 0.3);
+  color: #eef4ff;
+  backdrop-filter: blur(16px);
   padding: 14px;
+}
+
+.admin-applications main > .ant-typography {
+  color: rgba(221, 231, 255, 0.72);
+}
+
+.admin-applications .ant-table,
+.admin-applications .ant-table-container,
+.admin-applications .ant-table-thead > tr > th,
+.admin-applications .ant-table-tbody > tr > td {
+  background: transparent;
+  color: #eef4ff;
+}
+
+.admin-applications .ant-table-thead > tr > th {
+  border-bottom-color: rgba(161, 187, 255, 0.2);
+  color: rgba(221, 231, 255, 0.68);
+}
+
+.admin-applications .ant-table-tbody > tr > td {
+  border-bottom-color: rgba(161, 187, 255, 0.14);
 }
 .admin-applications .ant-table-cell .ant-btn + .ant-btn {
   margin-left: 8px;

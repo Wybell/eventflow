@@ -1,7 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { Button, Form, Input, Typography, message } from 'antd';
-import { ArrowLeft, LockKeyhole, Orbit, UserPlus, UserRound } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, LockKeyhole, UserPlus, UserRound } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import type { ApiError } from '../../shared/api/api-contract';
 import { useSessionStore } from '../../shared/auth/session-store';
 import { getCurrentUser, login, register } from './auth-api';
@@ -11,6 +12,7 @@ import './login-page.css';
 
 export function RegisterPage() {
   const navigate = useNavigate();
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const registerMutation = useMutation({ mutationFn: register });
 
@@ -36,7 +38,7 @@ export function RegisterPage() {
       <div className="login-page__content">
         <div className="login-page__identity">
           <div className="login-page__brand-mark" aria-hidden="true">
-            <Orbit size={25} strokeWidth={2.4} />
+            <img src="/icons/eventflow-192.png" alt="" />
           </div>
           <span>EventFlow</span>
         </div>
@@ -78,7 +80,15 @@ export function RegisterPage() {
               name="password"
               rules={[{ required: true, min: 6, message: '密码至少 6 位' }]}
             >
-              <Input.Password prefix={<LockKeyhole size={17} />} placeholder="至少 6 位" />
+              <Input.Password
+                iconRender={(visible) => (visible ? <EyeOff size={17} /> : <Eye size={17} />)}
+                prefix={<LockKeyhole size={17} />}
+                placeholder="至少 6 位"
+                visibilityToggle={{
+                  visible: passwordVisible,
+                  onVisibleChange: setPasswordVisible,
+                }}
+              />
             </Form.Item>
             <Form.Item label="手机号" name="mobile">
               <Input placeholder="选填" />

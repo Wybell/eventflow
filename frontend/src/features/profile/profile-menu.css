@@ -27,13 +27,47 @@
 }
 
 .profile-drawer .ant-drawer-header {
-  background: #f2fcff;
+  background: rgba(7, 11, 28, 0.94);
   border-bottom-color: #d9eef3;
+}
+
+.profile-drawer .ant-drawer-title,
+.profile-drawer .ant-drawer-close {
+  color: #f3f7ff;
+}
+
+.profile-drawer .ant-drawer-content {
+  background-image: linear-gradient(rgba(7, 11, 28, 0.88), rgba(11, 17, 43, 0.94)),
+    url('/images/profile-background.jpg');
+  background-position: center;
+  background-size: cover;
+}
+
+.profile-drawer .ant-drawer-body {
+  color: #eef4ff;
+}
+
+.profile-drawer .ant-tabs-tab,
+.profile-drawer .ant-tabs-tab-btn,
+.profile-drawer .ant-form-item-label > label,
+.profile-drawer .ant-typography {
+  color: rgba(236, 246, 255, 0.84);
+}
+
+.profile-drawer .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #b9efff;
+}
+
+.profile-drawer .ant-input,
+.profile-drawer .ant-input-affix-wrapper {
+  background: rgba(2, 8, 28, 0.42);
+  border-color: rgba(194, 221, 255, 0.3);
+  color: #f4f9ff;
 }
 
 .profile-summary {
   align-items: center;
-  border-bottom: 1px solid #dcecef;
+  border-bottom: 1px solid rgba(178, 201, 245, 0.2);
   display: flex;
   gap: 20px;
   margin-bottom: 8px;
@@ -41,13 +75,13 @@
 }
 
 .profile-summary h2.ant-typography {
-  color: #082842;
+  color: #f3f7ff;
   font-size: 23px;
   margin: 0 0 2px;
 }
 
 .profile-summary .ant-typography {
-  color: #657b89;
+  color: rgba(221, 231, 255, 0.68);
 }
 
 .profile-avatar-wrap {

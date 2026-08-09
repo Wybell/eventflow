@@ -1,0 +1,21 @@
+{
+  "name": "EventFlow 活动报名与预约平台",
+  "short_name": "EventFlow",
+  "description": "发现活动、管理报名与发布预约",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#080d1f",
+  "theme_color": "#080d1f",
+  "icons": [
+    {
+      "src": "/icons/eventflow-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/eventflow-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

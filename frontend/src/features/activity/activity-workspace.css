@@ -4,11 +4,12 @@
   --ink: #06142a;
   --panel: #092440;
   --line: rgba(94, 234, 255, 0.34);
+  background-image: linear-gradient(rgba(4, 8, 25, 0.74), rgba(5, 13, 35, 0.84)),
+    url('/images/activities-background.jpg');
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
   min-height: 100dvh;
-  background:
-    radial-gradient(circle at 22% 3%, rgba(49, 215, 239, 0.18), transparent 20rem),
-    radial-gradient(circle at 91% 24%, rgba(255, 189, 92, 0.1), transparent 17rem),
-    linear-gradient(135deg, #e9fbff 0%, #f9fdff 48%, #dff7fb 100%);
   color: #e9fdff;
   padding-bottom: 64px;
 }
@@ -63,6 +64,13 @@
   width: 46px;
 }
 
+.activity-workspace__brand-mark img {
+  border-radius: 6px;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
 .activity-workspace__header-actions {
   align-items: center;
   display: flex;
@@ -87,7 +95,7 @@
 
 .activity-workspace__intro {
   align-items: end;
-  color: var(--ink);
+  color: #f4f8ff;
   display: flex;
   gap: 36px;
   justify-content: space-between;
@@ -105,7 +113,7 @@
 }
 
 .activity-workspace__intro .ant-typography-paragraph {
-  color: #3a5871;
+  color: rgba(221, 231, 255, 0.72);
   font-size: 15px;
   margin: 0;
 }
@@ -118,10 +126,10 @@
 
 .activity-workspace__metric {
   align-items: center;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(15, 117, 146, 0.18);
-  box-shadow: 0 10px 28px rgba(24, 109, 130, 0.1);
-  color: var(--ink);
+  background: rgba(15, 26, 59, 0.76);
+  border: 1px solid rgba(151, 178, 244, 0.22);
+  box-shadow: 0 12px 28px rgba(1, 3, 17, 0.24);
+  color: #f4f8ff;
   display: flex;
   gap: 9px;
   min-height: 66px;
@@ -143,14 +151,14 @@
 }
 
 .activity-workspace__metric small {
-  color: #55728b;
+  color: rgba(221, 231, 255, 0.64);
   font-size: 12px;
   line-height: 1.5;
 }
 
 .activity-workspace__console {
   background:
-    linear-gradient(rgba(3, 23, 47, 0.97), rgba(5, 32, 62, 0.98)) padding-box,
+    linear-gradient(rgba(3, 23, 47, 0.78), rgba(5, 32, 62, 0.84)) padding-box,
     linear-gradient(130deg, #8effff, #0b85a0 43%, #ffd57a) border-box;
   border: 1px solid transparent;
   box-shadow: 0 22px 52px rgba(0, 44, 73, 0.23);
@@ -338,7 +346,31 @@
 
 .activity-workspace__drawer .ant-drawer-content,
 .activity-workspace__drawer .ant-drawer-header {
-  background: #f2fcff;
+  background: rgba(9, 17, 42, 0.96);
+  color: #f1f6ff;
+}
+
+.activity-workspace__drawer .ant-drawer-title,
+.activity-workspace__drawer .ant-drawer-close,
+.activity-workspace__drawer .ant-typography {
+  color: #f1f6ff;
+}
+
+.activity-workspace__drawer .ant-drawer-body {
+  background: rgba(9, 17, 42, 0.9);
+}
+
+.activity-workspace__drawer .ant-form-item-label > label {
+  color: rgba(236, 246, 255, 0.86);
+}
+
+.activity-workspace__drawer .ant-input,
+.activity-workspace__drawer .ant-input-affix-wrapper,
+.activity-workspace__drawer .ant-input-number,
+.activity-workspace__drawer .ant-picker {
+  background: rgba(2, 8, 28, 0.42);
+  border-color: rgba(194, 221, 255, 0.3);
+  color: #f4f9ff;
 }
 
 .activity-workspace__drawer .ant-drawer-header {

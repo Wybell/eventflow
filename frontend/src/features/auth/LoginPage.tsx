@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { Button, Form, Input, Typography } from 'antd';
-import { LockKeyhole, LogIn, Orbit, UserPlus, UserRound } from 'lucide-react';
+import { Eye, EyeOff, LockKeyhole, LogIn, UserPlus, UserRound } from 'lucide-react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSessionStore } from '../../shared/auth/session-store';
 import type { ApiError } from '../../shared/api/api-contract';
@@ -11,6 +12,7 @@ import './login-page.css';
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const setSession = useSessionStore((state) => state.setSession);
   const loginMutation = useMutation({ mutationFn: login });
 
@@ -34,7 +36,7 @@ export function LoginPage() {
       <div className="login-page__content">
         <div className="login-page__identity">
           <div className="login-page__brand-mark" aria-hidden="true">
-            <Orbit size={25} strokeWidth={2.4} />
+            <img src="/icons/eventflow-192.png" alt="" />
           </div>
           <span>EventFlow</span>
         </div>
@@ -69,9 +71,14 @@ export function LoginPage() {
           >
             <Input.Password
               autoComplete="current-password"
+              iconRender={(visible) => (visible ? <EyeOff size={17} /> : <Eye size={17} />)}
               prefix={<LockKeyhole size={17} />}
               placeholder="输入密码"
               size="large"
+              visibilityToggle={{
+                visible: passwordVisible,
+                onVisibleChange: setPasswordVisible,
+              }}
             />
           </Form.Item>
           {error ? <p className="login-panel__error">{error.message}</p> : null}

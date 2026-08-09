@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Empty, Input, Modal, Table, Tabs, Tag, Typography, message } from 'antd';
-import { CalendarDays, Check, Compass, RadioTower, X } from 'lucide-react';
+import { CalendarDays, Check, Compass, X } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ApiError } from '../../shared/api/api-contract';
@@ -65,7 +65,7 @@ export function ActivityReviewPage() {
       {contextHolder}
       <header>
         <div>
-          <RadioTower size={22} />
+          <img className="admin-applications__brand-logo" src="/icons/eventflow-192.png" alt="" />
           <strong>EventFlow 管理中心</strong>
         </div>
         <div className="admin-applications__header-actions">
