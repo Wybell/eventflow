@@ -351,8 +351,9 @@
 }
 
 .activity-workspace__drawer .ant-drawer-header {
-  background: rgba(7, 14, 36, 0.62) !important;
-  border-bottom-color: rgba(154, 213, 255, 0.2);
+  background: linear-gradient(100deg, #07152f, #16284f) !important;
+  border-bottom-color: rgba(130, 218, 255, 0.32);
+  box-shadow: 0 8px 24px rgba(1, 5, 20, 0.26);
 }
 
 .activity-workspace__drawer .ant-drawer-title,
@@ -405,7 +406,9 @@
 }
 
 .activity-workspace__drawer .ant-drawer-title {
+  color: #f7fbff !important;
   font-size: 18px;
+  text-shadow: 0 1px 12px rgba(113, 218, 255, 0.2);
 }
 
 .activity-workspace__drawer-actions {
@@ -421,11 +424,17 @@
 
 .activity-workspace__detail-status {
   align-items: center;
-  color: #507087;
+  color: rgba(218, 232, 255, 0.78);
   display: flex;
   font-size: 13px;
   gap: 12px;
   margin-bottom: 18px;
+}
+
+.activity-workspace__detail > .ant-typography {
+  color: rgba(235, 244, 255, 0.88) !important;
+  line-height: 1.75;
+  text-shadow: 0 1px 10px rgba(1, 4, 18, 0.46);
 }
 
 .activity-workspace__detail-status .activity-workspace__status--draft {
@@ -449,9 +458,9 @@
 }
 
 .activity-workspace__review-note {
-  background: #fff8e8;
-  border-left: 3px solid #e6a02c;
-  color: #765517;
+  background: rgba(113, 78, 20, 0.34);
+  border-left: 3px solid #ffc85c;
+  color: #ffe2a6 !important;
   padding: 10px 12px;
 }
 
@@ -466,23 +475,23 @@
 }
 
 .activity-workspace__session-heading {
-  border-top: 1px solid rgba(23, 125, 151, 0.16);
+  border-top: 1px solid rgba(154, 213, 255, 0.24);
   margin-top: 30px;
   padding-top: 24px;
 }
 
 .activity-workspace__session-heading h3.ant-typography {
-  color: #062c46;
+  color: #f5f9ff !important;
   font-size: 20px;
 }
 
 .activity-workspace__session-heading > div > span {
-  color: #0789a7;
+  color: #7ee9ff;
 }
 
 .activity-workspace__session-form {
-  background: #e6f9fd;
-  border: 1px solid rgba(30, 158, 185, 0.22);
+  background: rgba(5, 18, 43, 0.58);
+  border: 1px solid rgba(126, 233, 255, 0.26);
   margin-top: 18px;
   padding: 18px;
 }
@@ -496,6 +505,7 @@
 }
 
 .activity-workspace__session-list .ant-list-item {
+  border-bottom-color: rgba(154, 213, 255, 0.18);
   padding: 15px 0;
 }
 
@@ -512,8 +522,13 @@
   display: block;
 }
 
+.activity-workspace__session-item strong {
+  color: #f3f8ff;
+  text-shadow: 0 1px 10px rgba(1, 4, 18, 0.5);
+}
+
 .activity-workspace__session-item span {
-  color: #5a788f;
+  color: rgba(201, 220, 248, 0.76);
   font-size: 12px;
   margin-top: 4px;
 }
@@ -524,6 +539,14 @@
 
 .activity-workspace__quota .ant-progress {
   margin-top: 1px;
+}
+
+.activity-workspace__quota .ant-progress-bg {
+  background: linear-gradient(90deg, #56dcf2, #87f6ce) !important;
+}
+
+.activity-workspace__quota .ant-progress-inner {
+  background: rgba(224, 237, 255, 0.16);
 }
 
 @media (max-width: 760px) {
