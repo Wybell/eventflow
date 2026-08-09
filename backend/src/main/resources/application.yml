@@ -17,6 +17,10 @@ eventflow:
       refresh-token-ttl: P7D
   storage:
     avatar-directory: ${EVENTFLOW_AVATAR_DIRECTORY:uploads/avatars}
+  bootstrap-admin:
+    username: ${EVENTFLOW_BOOTSTRAP_ADMIN_USERNAME:}
+    password: ${EVENTFLOW_BOOTSTRAP_ADMIN_PASSWORD:}
+    display-name: ${EVENTFLOW_BOOTSTRAP_ADMIN_DISPLAY_NAME:}
 
 management:
   endpoints:

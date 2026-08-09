@@ -1,0 +1,13 @@
+.git
+.idea
+.run
+node_modules
+**/node_modules
+frontend/dist
+frontend/coverage
+backend/target
+backend/uploads
+docs
+assets
+deploy/.env
+*.log

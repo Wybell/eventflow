@@ -2,14 +2,13 @@ services:
   mysql:
     image: mysql:8.4
     container_name: eventflow-mysql
+    restart: unless-stopped
     environment:
       MYSQL_DATABASE: eventflow
       MYSQL_USER: eventflow
-      MYSQL_PASSWORD: ${EVENTFLOW_DB_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${EVENTFLOW_DB_ROOT_PASSWORD}
+      MYSQL_PASSWORD: ${EVENTFLOW_DB_PASSWORD:?Set EVENTFLOW_DB_PASSWORD in deploy/.env}
+      MYSQL_ROOT_PASSWORD: ${EVENTFLOW_DB_ROOT_PASSWORD:?Set EVENTFLOW_DB_ROOT_PASSWORD in deploy/.env}
       TZ: Asia/Shanghai
-    ports:
-      - "${EVENTFLOW_DB_PORT:-3306}:3306"
     volumes:
       - eventflow-mysql-data:/var/lib/mysql
     healthcheck:
@@ -21,9 +20,10 @@ services:
   redis:
     image: redis:7.4-alpine
     container_name: eventflow-redis
-    command: ["redis-server", "--appendonly", "yes"]
-    ports:
-      - "6379:6379"
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${EVENTFLOW_REDIS_PASSWORD:?Set EVENTFLOW_REDIS_PASSWORD in deploy/.env}"]
+    environment:
+      REDISCLI_AUTH: ${EVENTFLOW_REDIS_PASSWORD:?Set EVENTFLOW_REDIS_PASSWORD in deploy/.env}
     volumes:
       - eventflow-redis-data:/data
     healthcheck:
@@ -35,12 +35,10 @@ services:
   rabbitmq:
     image: rabbitmq:4.1-management-alpine
     container_name: eventflow-rabbitmq
+    restart: unless-stopped
     environment:
       RABBITMQ_DEFAULT_USER: eventflow
-      RABBITMQ_DEFAULT_PASS: ${EVENTFLOW_RABBITMQ_PASSWORD}
-    ports:
-      - "5672:5672"
-      - "15672:15672"
+      RABBITMQ_DEFAULT_PASS: ${EVENTFLOW_RABBITMQ_PASSWORD:?Set EVENTFLOW_RABBITMQ_PASSWORD in deploy/.env}
     volumes:
       - eventflow-rabbitmq-data:/var/lib/rabbitmq
     healthcheck:
@@ -49,7 +47,55 @@ services:
       timeout: 5s
       retries: 10
 
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: eventflow-backend
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      EVENTFLOW_DB_URL: jdbc:mysql://mysql:3306/eventflow?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+      EVENTFLOW_DB_USERNAME: ${EVENTFLOW_DB_USERNAME:-eventflow}
+      EVENTFLOW_DB_PASSWORD: ${EVENTFLOW_DB_PASSWORD:?Set EVENTFLOW_DB_PASSWORD in deploy/.env}
+      EVENTFLOW_REDIS_HOST: redis
+      EVENTFLOW_REDIS_PORT: 6379
+      EVENTFLOW_REDIS_PASSWORD: ${EVENTFLOW_REDIS_PASSWORD:?Set EVENTFLOW_REDIS_PASSWORD in deploy/.env}
+      EVENTFLOW_RABBITMQ_HOST: rabbitmq
+      EVENTFLOW_RABBITMQ_PORT: 5672
+      EVENTFLOW_RABBITMQ_USERNAME: ${EVENTFLOW_RABBITMQ_USERNAME:-eventflow}
+      EVENTFLOW_RABBITMQ_PASSWORD: ${EVENTFLOW_RABBITMQ_PASSWORD:?Set EVENTFLOW_RABBITMQ_PASSWORD in deploy/.env}
+      EVENTFLOW_JWT_SECRET: ${EVENTFLOW_JWT_SECRET:?Set EVENTFLOW_JWT_SECRET in deploy/.env}
+      EVENTFLOW_JWT_ISSUER: ${EVENTFLOW_JWT_ISSUER:-eventflow}
+      EVENTFLOW_AVATAR_DIRECTORY: /app/uploads/avatars
+      EVENTFLOW_BOOTSTRAP_ADMIN_USERNAME: ${EVENTFLOW_BOOTSTRAP_ADMIN_USERNAME:-}
+      EVENTFLOW_BOOTSTRAP_ADMIN_PASSWORD: ${EVENTFLOW_BOOTSTRAP_ADMIN_PASSWORD:-}
+      EVENTFLOW_BOOTSTRAP_ADMIN_DISPLAY_NAME: ${EVENTFLOW_BOOTSTRAP_ADMIN_DISPLAY_NAME:-}
+    expose:
+      - "8080"
+    volumes:
+      - eventflow-avatar-data:/app/uploads/avatars
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: frontend/Dockerfile
+    container_name: eventflow-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
 volumes:
   eventflow-mysql-data:
   eventflow-redis-data:
   eventflow-rabbitmq-data:
+  eventflow-avatar-data:

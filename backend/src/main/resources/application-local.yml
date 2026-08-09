@@ -11,6 +11,7 @@ spring:
     redis:
       host: ${EVENTFLOW_REDIS_HOST:localhost}
       port: ${EVENTFLOW_REDIS_PORT:6379}
+      password: ${EVENTFLOW_REDIS_PASSWORD:}
   rabbitmq:
     host: ${EVENTFLOW_RABBITMQ_HOST:localhost}
     port: ${EVENTFLOW_RABBITMQ_PORT:5672}
