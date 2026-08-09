@@ -1,3 +1,28 @@
+.activity-registrations-drawer .ant-drawer-content {
+  background-image: linear-gradient(rgba(5, 10, 30, 0.82), rgba(7, 14, 38, 0.92)),
+    url('/images/registration-background.jpg');
+  background-position: center;
+  background-size: cover;
+  color: #eef4ff;
+}
+
+.activity-registrations-drawer .ant-drawer-header {
+  background: rgba(4, 8, 24, 0.88);
+  border-bottom-color: rgba(161, 187, 255, 0.2);
+}
+
+.activity-registrations-drawer .ant-drawer-title,
+.activity-registrations-drawer .ant-drawer-close,
+.activity-registrations-drawer .ant-drawer-body,
+.activity-registrations-drawer .ant-statistic-content,
+.activity-registrations-drawer .ant-statistic-title {
+  color: #eef4ff;
+}
+
+.activity-registrations-drawer .ant-drawer-body {
+  background: rgba(5, 10, 30, 0.62);
+}
+
 .activity-registrations-drawer__title {
   display: flex;
   align-items: center;
@@ -10,7 +35,7 @@
   gap: 12px;
   margin-bottom: 24px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #e7edf2;
+  border-bottom: 1px solid rgba(161, 187, 255, 0.2);
 }
 
 .activity-registrations-drawer__filters {
@@ -30,11 +55,27 @@
   align-items: center;
   justify-content: center;
   width: 42px;
-  border: 1px solid #d9e2e8;
+  border: 1px solid rgba(194, 221, 255, 0.3);
   border-left: 0;
-  background: #f7fafb;
-  color: #19415d;
+  background: rgba(2, 8, 28, 0.4);
+  color: #c8f4ff;
   cursor: pointer;
+}
+
+.activity-registrations-drawer .ant-select-selector,
+.activity-registrations-drawer .ant-input {
+  background: rgba(2, 8, 28, 0.4) !important;
+  border-color: rgba(194, 221, 255, 0.3) !important;
+  color: #f4f9ff !important;
+}
+
+.activity-registrations-drawer .ant-input::placeholder,
+.activity-registrations-drawer .ant-select-selection-placeholder {
+  color: rgba(231, 241, 255, 0.58) !important;
+}
+
+.activity-registrations-drawer .ant-select-arrow {
+  color: rgba(231, 241, 255, 0.72);
 }
 
 .activity-registrations-drawer__loading {
@@ -65,8 +106,25 @@
 
 .activity-registrations-drawer__participant-main span,
 .activity-registrations-drawer__participant-meta {
-  color: #6c7c86;
+  color: rgba(215, 228, 255, 0.64);
   font-size: 12px;
+}
+
+.activity-registrations-drawer__participant-main strong {
+  color: #f4f9ff;
+}
+
+.activity-registrations-drawer .ant-list-item {
+  border-bottom-color: rgba(161, 187, 255, 0.16);
+}
+
+.activity-registrations-drawer .ant-list-item:hover {
+  background: rgba(95, 174, 224, 0.12);
+}
+
+.activity-registrations-drawer .ant-empty-description,
+.activity-registrations-drawer .ant-pagination-item a {
+  color: rgba(231, 241, 255, 0.72);
 }
 
 @media (max-width: 640px) {

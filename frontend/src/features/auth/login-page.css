@@ -119,6 +119,27 @@
   -webkit-text-fill-color: #f7fbff;
 }
 
+.register-panel .ant-form-item-control-input-content > input.ant-input {
+  background: rgba(2, 8, 28, 0.24) !important;
+  border-color: rgba(194, 221, 255, 0.3) !important;
+  border-radius: 8px;
+  color: #f7fbff !important;
+  min-height: 46px;
+  padding: 10px 12px;
+  -webkit-text-fill-color: #f7fbff;
+}
+
+.register-panel .ant-form-item-control-input-content > input.ant-input:focus {
+  background: rgba(2, 8, 28, 0.32) !important;
+  border-color: #8beaff !important;
+  box-shadow: 0 0 0 3px rgba(92, 220, 255, 0.16);
+}
+
+.register-panel .ant-form-item-control-input-content > input.ant-input::placeholder {
+  color: rgba(231, 241, 255, 0.62) !important;
+  -webkit-text-fill-color: rgba(231, 241, 255, 0.62);
+}
+
 .login-panel input:-webkit-autofill,
 .login-panel input:-webkit-autofill:hover,
 .login-panel input:-webkit-autofill:focus,

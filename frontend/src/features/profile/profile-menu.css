@@ -44,6 +44,10 @@
 }
 
 .profile-drawer .ant-drawer-body {
+  background-image: linear-gradient(rgba(7, 11, 28, 0.84), rgba(11, 17, 43, 0.92)),
+    url('/images/profile-background.jpg');
+  background-position: center;
+  background-size: cover;
   color: #eef4ff;
 }
 
@@ -63,6 +67,20 @@
   background: rgba(2, 8, 28, 0.42);
   border-color: rgba(194, 221, 255, 0.3);
   color: #f4f9ff;
+}
+
+.profile-drawer .ant-input-affix-wrapper .ant-input {
+  background: transparent !important;
+  color: #f4f9ff !important;
+  -webkit-text-fill-color: #f4f9ff;
+}
+
+.profile-drawer .ant-input::placeholder {
+  color: rgba(231, 241, 255, 0.58) !important;
+}
+
+.profile-drawer .ant-tabs-nav::before {
+  border-bottom-color: rgba(178, 201, 245, 0.2);
 }
 
 .profile-summary {
