@@ -60,9 +60,10 @@
   font-size: 38px;
   margin: 0 0 10px;
 }
-.event-explore__intro p.ant-typography {
+.event-explore__intro .ant-typography-paragraph {
   color: rgba(221, 231, 255, 0.82) !important;
   margin: 0;
+  text-shadow: 0 1px 10px rgba(1, 4, 18, 0.72);
 }
 .event-explore__identity {
   background: #d8fbff;

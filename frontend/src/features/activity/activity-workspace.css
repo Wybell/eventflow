@@ -4,7 +4,7 @@
   --ink: #06142a;
   --panel: #092440;
   --line: rgba(94, 234, 255, 0.34);
-  background-image: linear-gradient(rgba(4, 8, 25, 0.74), rgba(5, 13, 35, 0.84)),
+  background-image: linear-gradient(rgba(4, 8, 25, 0.46), rgba(5, 13, 35, 0.64)),
     url('/images/activities-background.jpg');
   background-position: center;
   background-size: cover;
