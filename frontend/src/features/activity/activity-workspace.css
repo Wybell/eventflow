@@ -344,20 +344,25 @@
   color: rgba(226, 251, 255, 0.72);
 }
 
-.activity-workspace__drawer .ant-drawer-content,
-.activity-workspace__drawer .ant-drawer-header {
-  background: rgba(9, 17, 42, 0.96);
+.activity-workspace__drawer .ant-drawer-content {
+  backdrop-filter: blur(20px) saturate(118%);
+  background: rgba(7, 14, 36, 0.54) !important;
   color: #f1f6ff;
+}
+
+.activity-workspace__drawer .ant-drawer-header {
+  background: rgba(7, 14, 36, 0.62) !important;
+  border-bottom-color: rgba(154, 213, 255, 0.2);
 }
 
 .activity-workspace__drawer .ant-drawer-title,
 .activity-workspace__drawer .ant-drawer-close,
 .activity-workspace__drawer .ant-typography {
-  color: #f1f6ff;
+  color: #f4f9ff !important;
 }
 
 .activity-workspace__drawer .ant-drawer-body {
-  background: rgba(9, 17, 42, 0.9);
+  background: rgba(7, 14, 36, 0.46) !important;
 }
 
 .activity-workspace__drawer .ant-form-item-label > label {
@@ -368,17 +373,35 @@
 .activity-workspace__drawer .ant-input-affix-wrapper,
 .activity-workspace__drawer .ant-input-number,
 .activity-workspace__drawer .ant-picker {
-  background: rgba(2, 8, 28, 0.42);
-  border-color: rgba(194, 221, 255, 0.3);
-  color: #f4f9ff;
+  background: rgba(2, 8, 28, 0.38) !important;
+  border-color: rgba(194, 221, 255, 0.34) !important;
+  color: #f4f9ff !important;
 }
 
-.activity-workspace__drawer .ant-drawer-header {
-  border-bottom-color: rgba(20, 135, 161, 0.17);
+.activity-workspace__drawer .ant-input-affix-wrapper .ant-input,
+.activity-workspace__drawer .ant-picker-input > input,
+.activity-workspace__drawer .ant-input-number-input {
+  background: transparent !important;
+  color: #f4f9ff !important;
+  -webkit-text-fill-color: #f4f9ff;
+}
+
+.activity-workspace__drawer .ant-input::placeholder,
+.activity-workspace__drawer .ant-picker-input > input::placeholder,
+.activity-workspace__drawer .ant-input-number-input::placeholder {
+  color: rgba(231, 241, 255, 0.58) !important;
+  -webkit-text-fill-color: rgba(231, 241, 255, 0.58);
+}
+
+.activity-workspace__drawer input:-webkit-autofill,
+.activity-workspace__drawer input:-webkit-autofill:hover,
+.activity-workspace__drawer input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px rgba(2, 8, 28, 0.38) inset !important;
+  -webkit-text-fill-color: #f4f9ff !important;
+  caret-color: #f4f9ff;
 }
 
 .activity-workspace__drawer .ant-drawer-title {
-  color: #062c46;
   font-size: 18px;
 }
 
