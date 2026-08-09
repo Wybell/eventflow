@@ -90,7 +90,7 @@ services:
     container_name: eventflow-frontend
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "127.0.0.1:${EVENTFLOW_HTTP_PORT:-8083}:80"
     depends_on:
       - backend
 

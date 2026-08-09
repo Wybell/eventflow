@@ -47,7 +47,26 @@ docker compose ps
 docker compose logs -f backend
 ```
 
-前端通过 `80` 端口提供页面，Nginx 会将 `/api` 转发给 Spring Boot。前端路由刷新由 Nginx 回退到 `index.html`。
+前端容器默认只监听服务器本机的 `127.0.0.1:8083`，不会占用服务器现有的 `80/443`。容器内 Nginx 会将 `/api` 转发给 Spring Boot，前端路由刷新会回退到 `index.html`。
+
+在服务器现有 Nginx 中为 EventFlow 增加独立域名，并将请求转发到本机端口：
+
+```nginx
+server {
+    listen 80;
+    server_name eventflow.example.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:8083;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+将 `eventflow.example.com` 替换为实际域名，执行 `nginx -t` 通过后再重载 Nginx。
 
 ## 4. 数据和头像
 
@@ -70,7 +89,7 @@ chmod +x backup.sh
 ## 6. 上线检查
 
 ```bash
-curl http://127.0.0.1/actuator/health
+curl http://127.0.0.1:8083/actuator/health
 docker compose ps
 ```
 
