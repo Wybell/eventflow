@@ -1,14 +1,15 @@
 .activity-registrations-drawer .ant-drawer-content {
-  background-image: linear-gradient(rgba(5, 10, 30, 0.82), rgba(7, 14, 38, 0.92)),
-    url('/images/registration-background.jpg');
+  background-image: linear-gradient(rgba(5, 10, 30, 0.28), rgba(7, 14, 38, 0.48)),
+    url('/images/registration-background.png');
   background-position: center;
   background-size: cover;
   color: #eef4ff;
 }
 
 .activity-registrations-drawer .ant-drawer-header {
-  background: rgba(4, 8, 24, 0.88);
+  background: rgba(4, 8, 24, 0.72);
   border-bottom-color: rgba(161, 187, 255, 0.2);
+  backdrop-filter: blur(12px);
 }
 
 .activity-registrations-drawer .ant-drawer-title,
@@ -20,7 +21,13 @@
 }
 
 .activity-registrations-drawer .ant-drawer-body {
-  background: rgba(5, 10, 30, 0.62);
+  background: rgba(5, 10, 30, 0.26);
+  backdrop-filter: blur(2px);
+}
+
+.activity-registrations-drawer .ant-statistic-title,
+.activity-registrations-drawer .ant-statistic-content {
+  text-shadow: 0 1px 12px rgba(1, 4, 18, 0.7);
 }
 
 .activity-registrations-drawer__title {
@@ -64,7 +71,7 @@
 
 .activity-registrations-drawer .ant-select-selector,
 .activity-registrations-drawer .ant-input {
-  background: rgba(2, 8, 28, 0.4) !important;
+  background: rgba(2, 8, 28, 0.5) !important;
   border-color: rgba(194, 221, 255, 0.3) !important;
   color: #f4f9ff !important;
 }

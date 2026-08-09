@@ -27,8 +27,9 @@
 }
 
 .profile-drawer .ant-drawer-header {
-  background: rgba(7, 11, 28, 0.94);
+  background: rgba(7, 11, 28, 0.7);
   border-bottom-color: #d9eef3;
+  backdrop-filter: blur(12px);
 }
 
 .profile-drawer .ant-drawer-title,
@@ -37,17 +38,15 @@
 }
 
 .profile-drawer .ant-drawer-content {
-  background-image: linear-gradient(rgba(7, 11, 28, 0.88), rgba(11, 17, 43, 0.94)),
+  background-image: linear-gradient(rgba(7, 11, 28, 0.42), rgba(11, 17, 43, 0.58)),
     url('/images/profile-background.jpg');
   background-position: center;
   background-size: cover;
 }
 
 .profile-drawer .ant-drawer-body {
-  background-image: linear-gradient(rgba(7, 11, 28, 0.84), rgba(11, 17, 43, 0.92)),
-    url('/images/profile-background.jpg');
-  background-position: center;
-  background-size: cover;
+  background: rgba(5, 10, 30, 0.16);
+  backdrop-filter: blur(1px);
   color: #eef4ff;
 }
 
