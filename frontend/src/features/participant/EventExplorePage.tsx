@@ -149,7 +149,7 @@ export function EventExplorePage() {
         width={600}
       >
         {selectedActivity ? (
-          <>
+          <div className="event-explore__drawer-surface event-explore__detail-surface">
             <Typography.Paragraph>
               {selectedActivity.summary || '主办方暂未填写活动简介。'}
             </Typography.Paragraph>
@@ -193,7 +193,7 @@ export function EventExplorePage() {
                 />
               )}
             />
-          </>
+          </div>
         ) : null}
       </Drawer>
       <Drawer
@@ -203,6 +203,7 @@ export function EventExplorePage() {
         title="我的报名"
         width={520}
       >
+        <div className="event-explore__drawer-surface event-explore__registrations-surface">
         <List
           dataSource={registrationsQuery.data ?? []}
           loading={registrationsQuery.isLoading}
@@ -218,6 +219,7 @@ export function EventExplorePage() {
             />
           )}
         />
+        </div>
       </Drawer>
     </section>
   );

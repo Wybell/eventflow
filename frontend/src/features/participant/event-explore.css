@@ -139,7 +139,38 @@
 }
 
 .event-explore__drawer .ant-drawer-body {
-  background: rgba(9, 17, 42, 0.9);
+  background: transparent !important;
+  padding: 0 !important;
+}
+.event-explore__drawer-surface {
+  min-height: 100%;
+  box-sizing: border-box;
+  padding: 24px 28px;
+  background-image: linear-gradient(rgba(7, 14, 38, 0.44), rgba(7, 14, 38, 0.66)),
+    url('/images/registration-background.png');
+  background-position: center;
+  background-size: cover;
+  color: #eff7ff;
+}
+.event-explore__drawer-surface .ant-list,
+.event-explore__drawer-surface .event-explore__registration-window {
+  background: rgba(7, 16, 42, 0.34);
+  backdrop-filter: blur(8px);
+}
+.event-explore__drawer-surface .ant-list-item {
+  border-bottom-color: rgba(157, 207, 255, 0.22);
+}
+.event-explore__drawer-surface .ant-typography,
+.event-explore__drawer-surface .ant-list-item strong {
+  color: #f4f8ff !important;
+  text-shadow: 0 1px 10px rgba(1, 4, 18, 0.65);
+}
+.event-explore__session strong,
+.event-explore__registration strong {
+  color: #f4f8ff;
+}
+.event-explore__session b {
+  color: #6ce7ff;
 }
 .event-explore__detail-meta {
   color: rgba(215, 228, 255, 0.68);
