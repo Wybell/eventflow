@@ -8,9 +8,10 @@
 }
 
 .activity-registrations-drawer .ant-drawer-header {
-  background: rgba(4, 8, 24, 0.72);
-  border-bottom-color: rgba(161, 187, 255, 0.2);
+  background: linear-gradient(110deg, rgba(6, 17, 47, 0.96), rgba(27, 31, 70, 0.92)) !important;
+  border-bottom-color: rgba(116, 225, 255, 0.42) !important;
   backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(1, 5, 20, 0.3);
 }
 
 .activity-registrations-drawer .ant-drawer-title,
