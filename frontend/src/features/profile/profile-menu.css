@@ -39,13 +39,14 @@
 
 .profile-drawer .ant-drawer-content {
   background-image: linear-gradient(rgba(7, 11, 28, 0.42), rgba(11, 17, 43, 0.58)),
-    url('/images/profile-background.jpg');
+    url('/images/profile-background.jpg') !important;
   background-position: center;
   background-size: cover;
+  background-color: #07132f !important;
 }
 
 .profile-drawer .ant-drawer-body {
-  background: rgba(5, 10, 30, 0.16);
+  background: rgba(5, 10, 30, 0.16) !important;
   backdrop-filter: blur(1px);
   color: #eef4ff;
 }

@@ -1,8 +1,9 @@
 .activity-registrations-drawer .ant-drawer-content {
   background-image: linear-gradient(rgba(5, 10, 30, 0.28), rgba(7, 14, 38, 0.48)),
-    url('/images/registration-background.png');
+    url('/images/registration-background.png') !important;
   background-position: center;
   background-size: cover;
+  background-color: #07132f !important;
   color: #eef4ff;
 }
 
@@ -21,7 +22,7 @@
 }
 
 .activity-registrations-drawer .ant-drawer-body {
-  background: rgba(5, 10, 30, 0.26);
+  background: rgba(5, 10, 30, 0.26) !important;
   backdrop-filter: blur(2px);
 }
 
