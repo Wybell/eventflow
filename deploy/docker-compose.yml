@@ -9,6 +9,8 @@ services:
       MYSQL_PASSWORD: ${EVENTFLOW_DB_PASSWORD:?Set EVENTFLOW_DB_PASSWORD in deploy/.env}
       MYSQL_ROOT_PASSWORD: ${EVENTFLOW_DB_ROOT_PASSWORD:?Set EVENTFLOW_DB_ROOT_PASSWORD in deploy/.env}
       TZ: Asia/Shanghai
+    ports:
+      - "127.0.0.1:${EVENTFLOW_DB_PORT:-3307}:3306"
     volumes:
       - eventflow-mysql-data:/var/lib/mysql
     healthcheck:
