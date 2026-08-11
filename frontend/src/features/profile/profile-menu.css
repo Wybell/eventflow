@@ -88,6 +88,12 @@
   -webkit-text-fill-color: #f4f9ff;
 }
 
+.profile-drawer .ant-form-item-has-error .ant-input-affix-wrapper,
+.profile-drawer .ant-form-item-has-error .ant-input-affix-wrapper:hover,
+.profile-drawer .ant-form-item-has-error .ant-input-affix-wrapper:focus-within {
+  background: rgba(2, 8, 28, 0.42) !important;
+}
+
 .profile-drawer .ant-input::placeholder {
   color: rgba(231, 241, 255, 0.58) !important;
 }

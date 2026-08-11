@@ -400,7 +400,7 @@
 .activity-workspace__drawer input:-webkit-autofill,
 .activity-workspace__drawer input:-webkit-autofill:hover,
 .activity-workspace__drawer input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px rgba(2, 8, 28, 0.38) inset !important;
+  -webkit-box-shadow: 0 0 0 1000px #07132f inset !important;
   -webkit-text-fill-color: #f4f9ff !important;
   caret-color: #f4f9ff;
 }

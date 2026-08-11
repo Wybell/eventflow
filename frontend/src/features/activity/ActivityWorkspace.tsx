@@ -289,6 +289,7 @@ export function ActivityWorkspace() {
         width={520}
       >
         <Form<ActivityFormValues>
+          autoComplete="off"
           form={activityForm}
           layout="vertical"
           onFinish={(values) => activityMutation.mutate(values)}
@@ -372,7 +373,10 @@ export function ActivityWorkspace() {
         {selectedActivity !== null ? (
           <section className="activity-workspace__detail">
             <div className="activity-workspace__detail-status">
-              <StatusTag status={selectedActivity.status} />
+              <StatusTag
+                isConfigured={(sessionsQuery.data?.length ?? 0) > 0}
+                status={selectedActivity.status}
+              />
               <span>
                 {formatDateRange(
                   selectedActivity.registrationStartTime,
@@ -572,9 +576,15 @@ function ActivityRow({
   );
 }
 
-function StatusTag({ status }: { status: Activity['status'] }) {
+function StatusTag({
+  isConfigured = false,
+  status,
+}: {
+  isConfigured?: boolean;
+  status: Activity['status'];
+}) {
   const labels: Record<Activity['status'], string> = {
-    DRAFT: '草稿待配置',
+    DRAFT: isConfigured ? '草稿已完成配置' : '草稿待配置',
     PENDING_REVIEW: '审核中',
     APPROVED: '审核通过，待发布',
     REJECTED: '已驳回，待修改',
