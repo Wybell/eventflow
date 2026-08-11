@@ -243,10 +243,10 @@ export function ProfileMenu() {
                     name="newPassword"
                     rules={[
                       { required: true, message: '请输入新密码' },
-                      { min: 8, message: '新密码至少 8 位' },
+                      { min: 8, max: 72, message: '新密码需要 8-72 位' },
                     ]}
                   >
-                    <Input.Password autoComplete="new-password" />
+                    <Input.Password autoComplete="new-password" maxLength={72} />
                   </Form.Item>
                   <Form.Item
                     dependencies={['newPassword']}
@@ -262,7 +262,7 @@ export function ProfileMenu() {
                       }),
                     ]}
                   >
-                    <Input.Password autoComplete="new-password" />
+                    <Input.Password autoComplete="new-password" maxLength={72} />
                   </Form.Item>
                   <Button htmlType="submit" loading={passwordMutation.isPending} type="primary">
                     修改密码

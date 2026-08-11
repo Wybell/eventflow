@@ -57,6 +57,8 @@ server {
     listen 80;
     server_name eventflow.example.com;
 
+    client_max_body_size 6m;
+
     location / {
         proxy_pass http://127.0.0.1:8083;
         proxy_set_header Host $host;
@@ -68,6 +70,8 @@ server {
 ```
 
 将 `eventflow.example.com` 替换为实际域名，执行 `nginx -t` 通过后再重载 Nginx。
+域名备案完成前使用 IP 和 `8084` 端口访问时，可以将仓库中的 `nginx-eventflow-ip.conf`
+复制到宿主机 `/etc/nginx/conf.d/eventflow-temp.conf`。
 
 ## 4. 数据和头像
 
