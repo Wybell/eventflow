@@ -1,0 +1,99 @@
+name: Deploy Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_scope:
+        description: Select the services to deploy.
+        required: true
+        default: all
+        type: choice
+        options:
+          - frontend
+          - backend
+          - all
+      confirm:
+        description: Confirm that CI is green and this release should deploy to production.
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  checks: read
+  contents: read
+
+concurrency:
+  group: eventflow-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy main to Tencent Cloud
+    if: ${{ inputs.confirm }}
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Resolve release revision
+        id: revision
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Require successful CI for this revision
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_SHA: ${{ steps.revision.outputs.sha }}
+        run: |
+          checks="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${GITHUB_REPOSITORY}/commits/${RELEASE_SHA}/check-runs?filter=latest" \
+            --jq '[.check_runs[] | select(.name == "Frontend checks" or .name == "Backend checks") | {name, status, conclusion}]')"
+          echo "$checks"
+          echo "$checks" | jq -e 'length == 2 and all(.[]; .status == "completed" and .conclusion == "success")' >/dev/null
+
+      - name: Configure deployment SSH key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.EVENTFLOW_SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.EVENTFLOW_SSH_KNOWN_HOSTS }}
+        run: |
+          test -n "$SSH_PRIVATE_KEY"
+          test -n "$SSH_KNOWN_HOSTS"
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$SSH_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/id_ed25519" "$HOME/.ssh/known_hosts"
+
+      - name: Upload deployment script
+        env:
+          SSH_HOST: ${{ secrets.EVENTFLOW_SSH_HOST }}
+          SSH_PORT: ${{ secrets.EVENTFLOW_SSH_PORT }}
+          SSH_USER: ${{ secrets.EVENTFLOW_SSH_USER }}
+        run: |
+          test -n "$SSH_HOST"
+          test -n "$SSH_PORT"
+          test -n "$SSH_USER"
+          scp -P "$SSH_PORT" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            scripts/deploy-production.sh \
+            "$SSH_USER@$SSH_HOST:/tmp/eventflow-deploy-production.sh"
+
+      - name: Deploy release
+        env:
+          SSH_HOST: ${{ secrets.EVENTFLOW_SSH_HOST }}
+          SSH_PORT: ${{ secrets.EVENTFLOW_SSH_PORT }}
+          SSH_USER: ${{ secrets.EVENTFLOW_SSH_USER }}
+          RELEASE_SHA: ${{ steps.revision.outputs.sha }}
+          RELEASE_SCOPE: ${{ inputs.release_scope }}
+        run: |
+          ssh -p "$SSH_PORT" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$SSH_HOST" \
+            "bash /tmp/eventflow-deploy-production.sh '$RELEASE_SHA' '$RELEASE_SCOPE'"
