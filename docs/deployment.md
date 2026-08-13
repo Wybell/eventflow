@@ -66,14 +66,20 @@ nginx -t && systemctl reload nginx
 
 ## 日常发布
 
-发布前先在本地确认项目代码已经提交和推送：
+日常发布的默认路径是 GitHub Actions，而不是登录服务器手动执行 `git pull`。先在本地确认代码已经提交并推送：
 
 ```bash
 git status --short --branch
 git push origin main
 ```
 
-服务器只在要发布时操作，不需要持续盯着。所有 Compose 服务都使用 `restart: unless-stopped`，Docker 和服务器重启后会自动拉起。
+推送到 `main` 后，等待 GitHub Actions 的 `CI` 完成。前端 10 项测试、Lint、类型检查和构建，以及后端 34 项测试、Checkstyle 和打包都通过后，在 Actions 页手动运行 `Deploy Production`：选择 `frontend`、`backend` 或 `all`，勾选 `confirm` 后运行。发布工作流会再次验证本次 `main` 提交的 CI 结果，使用 SSH 在服务器上检出指定提交、按范围构建容器，并检查 `/actuator/health` 返回 HTTP 200。
+
+这不是自动部署：任何 `git push` 都只会触发 CI，必须由维护者在 GitHub Actions 明确确认后才会发布。首次 SSH 授权与测试流程见 [CI 与手动发布](ci-cd.md)。所有 Compose 服务都使用 `restart: unless-stopped`，Docker 和服务器重启后会自动拉起。
+
+### 服务器应急备用操作
+
+以下命令仅用于 GitHub Actions 不可用时的应急维护或本地排障，不作为日常发布入口。执行前仍需确认目标提交已通过 CI。
 
 ### 只更新前端
 

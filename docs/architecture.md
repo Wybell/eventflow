@@ -32,6 +32,12 @@ flowchart TB
     Volume[("Docker volumes\nDB/头像/Redis/MQ")]
   end
 
+  subgraph Delivery["交付流水线"]
+    GitHub["GitHub main"]
+    CI["GitHub Actions CI\n前端质量检查 + 后端 verify"]
+    CD["Deploy Production\n手动确认、指定版本发布"]
+  end
+
   UI --> State
   UI --> Query
   UI --> Host --> Web --> Security
@@ -44,7 +50,11 @@ flowchart TB
   DB --- Volume
   Redis --- Volume
   MQ --- Volume
+  GitHub --> CI --> CD
+  CD -. "SSH，首次授权后" .-> Host
 ```
+
+代码推送到 `main` 或针对 `main` 的 Pull Request 会自动触发 CI。前端在 pnpm 锁定依赖下执行 ESLint、TypeScript、Vitest 和 Vite 构建；后端在 Java 17 下执行 Maven `verify`，覆盖 Checkstyle、34 项单元测试和可运行 JAR 打包。生产发布是独立的 `workflow_dispatch` 工作流：必须由维护者在 GitHub Actions 勾选确认，且会拒绝未通过前后端 CI 的提交。它不会因 `git push` 自动部署。
 
 ## 前端边界
 
@@ -175,4 +185,4 @@ total_quota = available_quota + reserved_quota + confirmed_quota
 
 ## 当前实现边界
 
-Redis、RabbitMQ 已在 Docker Compose 和生产配置中声明，但没有在当前报名、审核、资料等业务代码中读写。候补、签到、超时释放、消息通知、缓存和 CI/CD 是合理的后续方向，但不是当前版本已交付功能。
+Redis、RabbitMQ 已在 Docker Compose 和生产配置中声明，但没有在当前报名、审核、资料等业务代码中读写。GitHub Actions CI 已验证通过；手动生产发布工作流已实现，待完成首次服务器 SSH 授权与线上发布验证。候补、签到、超时释放、消息通知、缓存、端到端测试和数据库并发压测仍是后续方向，不是当前版本已交付功能。

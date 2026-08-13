@@ -139,10 +139,10 @@ docker compose ps frontend
 
 GitHub Actions 会在推送到 `main`、提交 Pull Request 或手动触发时运行 `.github/workflows/ci.yml`：
 
-- 前端：锁定依赖安装、ESLint、TypeScript 类型检查、Vitest 测试、Vite 生产构建。
-- 后端：Java 17 环境下执行 Maven `verify`，覆盖 Checkstyle、测试和打包校验。
+- 前端：锁定依赖安装、ESLint、TypeScript 类型检查、Vitest 10 项测试、Vite 生产构建。
+- 后端：Java 17 环境下执行 Maven `verify`，覆盖 Checkstyle、34 项单元测试和打包校验。
 
-CI 只读仓库，不包含 SSH、GitHub Secrets 或自动部署。CI 通过后，可在 GitHub Actions 中手动运行 `Deploy Production`，选择前端、后端或全量发布。该工作流会再次确认当前 `main` 提交的前后端 CI 均成功，再连接腾讯云部署指定版本。首次配置、密钥边界与发布流程见 [CI 与手动发布](docs/ci-cd.md)。
+`CI` 只读仓库，不包含 SSH、GitHub Secrets 或自动部署。`Deploy Production` 是独立的、仅手动触发的工作流：CI 通过后，维护者在 Actions 中选择前端、后端或全量发布，工作流会再次确认当前 `main` 提交的前后端检查均成功，再连接腾讯云部署指定版本。生产 SSH 授权与首次发布验证完成前，不将该工作流视为已验证的线上发布能力。首次配置、密钥边界与发布流程见 [CI 与手动发布](docs/ci-cd.md)。
 
 ## 项目文档
 
@@ -154,6 +154,6 @@ CI 只读仓库，不包含 SSH、GitHub Secrets 或自动部署。CI 通过后�
 
 ## 当前边界与下一步
 
-当前版本已完成活动审核、发布、场次配额、报名取消、资料管理、云端部署、GitHub Actions CI 和手动触发的生产发布。以下方向尚未接入核心业务：候补名单、临时预约超时释放、签到核销、消息通知消费者、公开活动缓存、端到端测试、数据库并发压测和自动部署。
+当前版本已完成活动审核、发布、场次配额、报名取消、资料管理、云端部署和 GitHub Actions CI；手动生产发布工作流已实现，待完成首次服务器授权与发布验证。以下方向尚未接入核心业务：候补名单、临时预约超时释放、签到核销、消息通知消费者、公开活动缓存、端到端测试、数据库并发压测和自动部署。
 
 这些能力应在明确业务需求和压测证据后逐步引入，而不是仅为增加技术名词而堆叠。
