@@ -59,15 +59,16 @@ jobs:
 
       - name: Configure deployment SSH key
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.EVENTFLOW_SSH_PRIVATE_KEY }}
+          SSH_PRIVATE_KEY_B64: ${{ secrets.EVENTFLOW_SSH_PRIVATE_KEY_B64 }}
           SSH_KNOWN_HOSTS: ${{ secrets.EVENTFLOW_SSH_KNOWN_HOSTS }}
         run: |
-          test -n "$SSH_PRIVATE_KEY"
+          test -n "$SSH_PRIVATE_KEY_B64"
           test -n "$SSH_KNOWN_HOSTS"
           install -d -m 700 "$HOME/.ssh"
-          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > "$HOME/.ssh/id_ed25519"
+          printf '%s' "$SSH_PRIVATE_KEY_B64" | base64 --decode > "$HOME/.ssh/id_ed25519"
           printf '%s\n' "$SSH_KNOWN_HOSTS" | tr -d '\r' > "$HOME/.ssh/known_hosts"
           chmod 600 "$HOME/.ssh/id_ed25519" "$HOME/.ssh/known_hosts"
+          ssh-keygen -y -f "$HOME/.ssh/id_ed25519" >/dev/null
 
       - name: Upload deployment script
         env:

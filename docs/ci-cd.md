@@ -26,10 +26,10 @@ In the EventFlow repository, open **Settings -> Secrets and variables -> Actions
 | `EVENTFLOW_SSH_HOST` | Tencent Cloud public IP or hostname |
 | `EVENTFLOW_SSH_PORT` | SSH port, normally `22` |
 | `EVENTFLOW_SSH_USER` | Server user that owns `/opt/eventflow` and can run Docker |
-| `EVENTFLOW_SSH_PRIVATE_KEY` | Complete contents of `~/.ssh/eventflow-actions-deploy` |
+| `EVENTFLOW_SSH_PRIVATE_KEY_B64` | Single-line Base64 output of `base64 -w0 ~/.ssh/eventflow-actions-deploy` |
 | `EVENTFLOW_SSH_KNOWN_HOSTS` | Output of `ssh-keyscan -H <server-host>` collected from a trusted network |
 
-Never commit `deploy/.env`, SSH private keys, host keys, backups, or production passwords.
+The Base64 value is still a private key, not encryption. Never commit `deploy/.env`, SSH private keys, host keys, backups, or production passwords. After the first successful deployment, delete any unused legacy `EVENTFLOW_SSH_PRIVATE_KEY` secret.
 
 ## Release Behavior
 
