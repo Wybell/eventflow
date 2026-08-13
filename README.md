@@ -135,6 +135,15 @@ docker compose up -d --no-deps frontend
 docker compose ps frontend
 ```
 
+## 持续集成
+
+GitHub Actions 会在推送到 `main`、提交 Pull Request 或手动触发时运行 `.github/workflows/ci.yml`：
+
+- 前端：锁定依赖安装、ESLint、TypeScript 类型检查、Vitest 测试、Vite 生产构建。
+- 后端：Java 17 环境下执行 Maven `verify`，覆盖 Checkstyle、测试和打包校验。
+
+CI 只读仓库，不包含 SSH、GitHub Secrets 或自动部署。CI 通过后，仍由维护者按 [部署手册](docs/deployment.md) 手动选择前端、后端或全量更新服务器。
+
 ## 项目文档
 
 - [架构与模块边界](docs/architecture.md)
@@ -144,6 +153,6 @@ docker compose ps frontend
 
 ## 当前边界与下一步
 
-当前版本已完成活动审核、发布、场次配额、报名取消、资料管理和云端部署。以下方向尚未接入核心业务：候补名单、临时预约超时释放、签到核销、消息通知消费者、公开活动缓存、端到端测试、数据库并发压测和 CI/CD。
+当前版本已完成活动审核、发布、场次配额、报名取消、资料管理、云端部署和 GitHub Actions CI。以下方向尚未接入核心业务：候补名单、临时预约超时释放、签到核销、消息通知消费者、公开活动缓存、端到端测试、数据库并发压测和自动部署。
 
 这些能力应在明确业务需求和压测证据后逐步引入，而不是仅为增加技术名词而堆叠。
