@@ -49,6 +49,8 @@ if ! docker compose version >/dev/null 2>&1; then
   exit 1
 fi
 
+git config --global --add safe.directory "$APP_DIR"
+
 cd "$APP_DIR"
 
 if [[ "$(git symbolic-ref --quiet --short HEAD)" != "main" ]]; then

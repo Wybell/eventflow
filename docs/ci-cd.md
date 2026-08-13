@@ -6,7 +6,7 @@
 
 ## One-time Server Setup
 
-The workflow expects the server checkout at `/opt/eventflow`, on the `main` branch, with no uncommitted changes. Its `deploy/.env` remains on the server and is never uploaded to GitHub. Docker Compose v2, Git, Curl and Bash must be installed for the SSH user.
+The workflow expects the server checkout at `/opt/eventflow`, on the `main` branch, with no uncommitted changes. Its `deploy/.env` remains on the server and is never uploaded to GitHub. Docker Compose v2, Git, Curl and Bash must be installed for the SSH user. The deployment script explicitly marks `/opt/eventflow` as a Git `safe.directory`, which is required when the checkout was originally created by another account such as `root`.
 
 Create a dedicated deploy key locally, then allow its public key to log in to the server account that owns `/opt/eventflow`:
 
