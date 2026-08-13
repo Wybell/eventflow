@@ -71,4 +71,6 @@ jobs:
           cache-dependency-path: backend/pom.xml
 
       - name: Verify
-        run: ./mvnw -B verify
+        run: |
+          chmod +x mvnw
+          ./mvnw -B verify
