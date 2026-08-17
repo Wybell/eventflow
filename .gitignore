@@ -17,3 +17,12 @@ deploy/.env
 deploy/backups/
 backend/config/application-local.yml
 *.log
+
+# Private reference and interview materials stay local.
+docs/reference/a6-pingyun-knowledge-base/
+docs/project/EventFlow*面试*.docx
+docs/project/EventFlow*源码*.docx
+docs/project/qa-render/
+docs/resume-project-description.md
+tools/generate_eventflow_interview_qa.py
+tools/generate_eventflow_mastery_guide.py
